@@ -219,8 +219,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Newsletter Section */}
-      <div className="border-t border-gray-800">
+      {/* Newsletter Section
+        <div className="border-t border-gray-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <motion.div
             className="flex flex-col md:flex-row items-center justify-between gap-6"
@@ -268,6 +268,7 @@ export default function Footer() {
           </motion.div>
         </div>
       </div>
+      */}
 
       {/* Bottom Footer */}
       <div className="border-t border-gray-800">

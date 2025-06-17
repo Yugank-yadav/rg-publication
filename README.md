@@ -1,36 +1,169 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# RG Publication 📚
 
-## Getting Started
+A modern, interactive educational books and resources website built with Next.js, featuring stunning 3D animations and responsive design.
 
-First, run the development server:
+![RG Publication Website](https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&h=600&fit=crop&auto=format)
+
+## ✨ Features
+
+### 🎨 Interactive Design
+
+- **3D Cursor-Tracking Book**: Interactive 3D book in hero section that responds to mouse movement
+- **Smooth Animations**: Framer Motion animations throughout the site
+- **Responsive Layout**: Mobile-first design that works on all devices
+- **Modern UI**: Clean, professional design with custom theme color (#a8f1ff)
+
+### 📖 Content Sections
+
+- **Hero Section**: Interactive 3D book with cursor tracking
+- **Best Selling Books**: Featured publications with hover effects
+- **Trending Products**: Hot trending books with fire badges
+- **New Arrivals**: Latest publications with sparkle badges
+- **Testimonials**: Customer reviews with ratings
+- **Contact Form**: Business contact information and inquiry form
+- **Footer**: Newsletter signup and comprehensive site navigation
+
+### 🚀 Technical Features
+
+- **Next.js 15**: Latest version with App Router
+- **Tailwind CSS**: Utility-first CSS framework
+- **Framer Motion**: Advanced animations and interactions
+- **Image Optimization**: Next.js Image component with external image support
+- **Form Handling**: Contact form with validation
+- **SEO Optimized**: Proper meta tags and semantic HTML
+- **Production Ready**: Zero build errors, optimized for deployment
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15.3.3
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **Icons**: Heroicons
+- **Images**: Next.js Image with Unsplash integration
+- **Deployment**: Vercel (recommended)
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/rg-publication.git
+   cd rg-publication
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Run development server**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open in browser**
+   ```
+   http://localhost:3000
+   ```
+
+### Build for Production
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Create production build
+npm run build
+
+# Start production server
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📁 Project Structure
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```
+rg-publication/
+├── app/                    # Next.js App Router
+│   ├── globals.css        # Global styles
+│   ├── layout.js          # Root layout
+│   └── page.js            # Homepage
+├── components/            # React components
+│   ├── hero-section.js    # Interactive 3D hero
+│   ├── best-selling-books.js
+│   ├── trending-products.js
+│   ├── new-arrivals.js
+│   ├── testimonials.js
+│   ├── contact-us.js
+│   └── footer.js
+├── public/               # Static assets
+├── next.config.js        # Next.js configuration
+└── tailwind.config.js    # Tailwind configuration
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎯 Key Components
 
-## Learn More
+### Hero Section
 
-To learn more about Next.js, take a look at the following resources:
+- Interactive 3D book with cursor tracking
+- Smooth spring physics animations
+- Dynamic shadow effects
+- Responsive design
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Book Sections
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Grid layouts (1/2/4 columns)
+- Hover animations with scale/shadow effects
+- Star ratings and pricing
+- Category badges
 
-## Deploy on Vercel
+### Contact Form
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Form validation
+- Business information display
+- Social media links
+- Interactive animations
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌐 Deployment
+
+### Vercel (Recommended)
+
+1. Push code to GitHub
+2. Connect repository to Vercel
+3. Deploy automatically
+
+### Netlify
+
+1. Build the project: `npm run build`
+2. Deploy the `out` folder to Netlify
+
+## 📝 Environment Variables
+
+No environment variables required for basic functionality.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- **Unsplash**: High-quality images
+- **Heroicons**: Beautiful icon set
+- **Framer Motion**: Smooth animations
+- **Tailwind CSS**: Utility-first styling
+
+---
+
+**Built with ❤️ for education and learning**

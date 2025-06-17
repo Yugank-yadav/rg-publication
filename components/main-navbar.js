@@ -1,6 +1,6 @@
 "use client";
-
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Avatar } from "./avatar";
 import {
@@ -32,78 +32,95 @@ import {
 import { InboxIcon, MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 
 // Custom animated tab component for desktop with sliding underline and bounce
-function AnimatedTab({ children, isActive, onClick, className = "" }) {
+function AnimatedTab({ children, isActive, href, className = "" }) {
   return (
-    <motion.button
-      onClick={onClick}
-      whileTap={{ scale: 0.95 }}
-      whileHover={{ scale: 1.05 }}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-      className={`
-        relative inline-flex items-center gap-2 px-4 py-3 text-sm font-medium
-        transition-colors 
-        ${isActive ? "text-gray-900" : "text-gray-700 hover:text-gray-900"}
-        ${className}
-      `}
-    >
-      {children}
-      {isActive && (
-        <motion.div
-          layoutId="activeTabUnderline"
-          className="absolute bottom-0 left-0 right-0 h-1 rounded-t-sm"
-          style={{ backgroundColor: "#a8f1ff" }}
-          transition={{
-            type: "spring",
-            stiffness: 500,
-            damping: 30,
-          }}
-        />
-      )}
-    </motion.button>
+    <Link href={href} className="inline-block">
+      <motion.div
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        className={`
+          relative inline-flex items-center gap-2 px-4 py-3 text-sm font-medium
+          transition-colors cursor-pointer
+          ${isActive ? "text-gray-900" : "text-gray-700 hover:text-gray-900"}
+          ${className}
+        `}
+      >
+        {children}
+        {isActive && (
+          <motion.div
+            layoutId="activeTabUnderline"
+            className="absolute bottom-0 left-0 right-0 h-1 rounded-t-sm"
+            style={{ backgroundColor: "#a8f1ff" }}
+            transition={{
+              type: "spring",
+              stiffness: 500,
+              damping: 30,
+            }}
+          />
+        )}
+      </motion.div>
+    </Link>
   );
 }
 
 // Mobile animated tab component with sliding underline and bounce
-function MobileAnimatedTab({ children, isActive, onClick, className = "" }) {
+function MobileAnimatedTab({ children, isActive, href, className = "" }) {
   return (
-    <motion.button
-      onClick={onClick}
-      whileTap={{ scale: 0.98 }}
-      whileHover={{ scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-      className={`
-        relative block w-full text-left px-3 py-3 rounded-md text-base font-medium
-        transition-colors
-        ${isActive ? "text-gray-900" : "text-gray-700 hover:text-gray-900"}
-        ${className}
-      `}
-    >
-      {children}
-      {isActive && (
-        <motion.div
-          layoutId="activeMobileTabUnderline"
-          className="absolute bottom-0 left-3 right-3 h-0.5 rounded-t-sm"
-          style={{ backgroundColor: "#a8f1ff" }}
-          transition={{
-            type: "spring",
-            stiffness: 500,
-            damping: 30,
-          }}
-        />
-      )}
-    </motion.button>
+    <Link href={href} className="block w-full">
+      <motion.div
+        whileTap={{ scale: 0.98 }}
+        whileHover={{ scale: 1.02 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        className={`
+          relative block w-full text-left px-3 py-3 rounded-md text-base font-medium
+          transition-colors cursor-pointer
+          ${isActive ? "text-gray-900" : "text-gray-700 hover:text-gray-900"}
+          ${className}
+        `}
+      >
+        {children}
+        {isActive && (
+          <motion.div
+            layoutId="activeMobileTabUnderline"
+            className="absolute bottom-0 left-3 right-3 h-0.5 rounded-t-sm"
+            style={{ backgroundColor: "#a8f1ff" }}
+            transition={{
+              type: "spring",
+              stiffness: 500,
+              damping: 30,
+            }}
+          />
+        )}
+      </motion.div>
+    </Link>
   );
 }
 
 export default function MainNavbar() {
-  const [activeTab, setActiveTab] = useState("home");
+  const pathname = usePathname();
 
+  // Navigation items with proper routes
   const navItems = [
-    { id: "home", label: "Home" },
-    { id: "events", label: "Events" },
-    { id: "orders", label: "Orders" },
-    { id: "analytics", label: "Analytics" },
+    { id: "home", label: "Home", href: "/" },
+    { id: "about", label: "About", href: "/about" },
+    { id: "books", label: "Books", href: "/books" },
+    { id: "services", label: "Services", href: "/services" },
+    { id: "contact", label: "Contact", href: "/contact" },
   ];
+
+  // Determine active tab based on current pathname
+  const getActiveTab = () => {
+    const currentItem = navItems.find((item) => {
+      if (item.href === "/") {
+        return pathname === "/";
+      }
+      return pathname.startsWith(item.href);
+    });
+    return currentItem?.id || "home";
+  };
+
+  const activeTab = getActiveTab();
 
   // Create mobile menu items
   const mobileMenuItems = (
@@ -112,7 +129,7 @@ export default function MainNavbar() {
         <MobileAnimatedTab
           key={item.id}
           isActive={activeTab === item.id}
-          onClick={() => setActiveTab(item.id)}
+          href={item.href}
         >
           {item.label}
         </MobileAnimatedTab>
@@ -125,35 +142,48 @@ export default function MainNavbar() {
       {/* Mobile menu button */}
       <MobileMenuButton />
 
-      {/* Left side - Team/Brand dropdown */}
+      {/* Left side - Brand/Logo */}
+      <Link href="/" className="flex items-center gap-3">
+        <Avatar src="/next.svg" alt="RG Publication Logo" size="sm" />
+        <NavbarLabel className="font-bold text-lg">RG Publication</NavbarLabel>
+      </Link>
+
+      {/* Company dropdown (optional) */}
       <Dropdown>
         <DropdownButton as={NavbarItem}>
-          <Avatar src="/next.svg" alt="Company Logo" size="sm" />
-          <NavbarLabel>Your Company</NavbarLabel>
           <ChevronDownIcon className="h-4 w-4 text-gray-500" />
         </DropdownButton>
         <DropdownMenu className="min-w-64" anchor="bottom start">
           <DropdownItem>
-            <Cog8ToothIcon className="h-4 w-4 text-gray-500" />
-            <DropdownLabel>Settings</DropdownLabel>
+            <Link href="/about" className="flex items-center gap-2 w-full">
+              <Cog8ToothIcon className="h-4 w-4 text-gray-500" />
+              <DropdownLabel>About Us</DropdownLabel>
+            </Link>
           </DropdownItem>
           <DropdownDivider />
           <DropdownItem>
-            <Avatar src="/next.svg" size="sm" />
-            <DropdownLabel>Your Company</DropdownLabel>
+            <Link href="/books" className="flex items-center gap-2 w-full">
+              <Avatar src="/next.svg" size="sm" />
+              <DropdownLabel>Our Books</DropdownLabel>
+            </Link>
           </DropdownItem>
           <DropdownItem>
-            <Avatar
-              initials="TC"
-              className="bg-purple-500 text-white"
-              size="sm"
-            />
-            <DropdownLabel>Team Collaboration</DropdownLabel>
+            <Link href="/services" className="flex items-center gap-2 w-full">
+              <Avatar
+                initials="RG"
+                className="text-white"
+                style={{ backgroundColor: "#a8f1ff" }}
+                size="sm"
+              />
+              <DropdownLabel>Services</DropdownLabel>
+            </Link>
           </DropdownItem>
           <DropdownDivider />
           <DropdownItem>
-            <PlusIcon className="h-4 w-4 text-gray-500" />
-            <DropdownLabel>New team&hellip;</DropdownLabel>
+            <Link href="/contact" className="flex items-center gap-2 w-full">
+              <PlusIcon className="h-4 w-4 text-gray-500" />
+              <DropdownLabel>Contact Us</DropdownLabel>
+            </Link>
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -167,7 +197,7 @@ export default function MainNavbar() {
             <AnimatedTab
               key={item.id}
               isActive={activeTab === item.id}
-              onClick={() => setActiveTab(item.id)}
+              href={item.href}
             >
               {item.label}
             </AnimatedTab>
