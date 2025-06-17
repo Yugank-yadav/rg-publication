@@ -4,7 +4,6 @@ import TrendingProducts from "@/components/trending-products";
 import NewArrivals from "@/components/new-arrivals";
 import Testimonials from "@/components/testimonials";
 import ContactUs from "@/components/contact-us";
-import Footer from "@/components/footer";
 
 export default function Home() {
   return (
@@ -15,7 +14,7 @@ export default function Home() {
       <NewArrivals />
       <Testimonials />
       <ContactUs />
-      <Footer />
+      
     </div>
   );
 }
