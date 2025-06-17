@@ -119,4 +119,5 @@ export {
   NavbarDivider,
   NavbarLabel,
   MobileMenuButton,
+  NavbarContext,
 };

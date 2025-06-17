@@ -1,5 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
+import { useContext } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Avatar } from "./avatar";
@@ -19,6 +20,7 @@ import {
   NavbarSection,
   NavbarSpacer,
   MobileMenuButton,
+  NavbarContext,
 } from "./navbar";
 import {
   ArrowRightStartOnRectangleIcon,
@@ -66,8 +68,15 @@ function AnimatedTab({ children, isActive, href, className = "" }) {
 
 // Mobile animated tab component with sliding underline and bounce
 function MobileAnimatedTab({ children, isActive, href, className = "" }) {
+  const { setIsMobileMenuOpen } = useContext(NavbarContext);
+
+  const handleClick = () => {
+    // Close the mobile menu when a navigation item is clicked
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <Link href={href} className="block w-full">
+    <Link href={href} className="block w-full" onClick={handleClick}>
       <motion.div
         whileTap={{ scale: 0.98 }}
         whileHover={{ scale: 1.02 }}
