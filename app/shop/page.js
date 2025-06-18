@@ -588,7 +588,7 @@ export default function ShopPage() {
     <div className="min-h-screen bg-gray-50">
       <style jsx>{sliderStyles}</style>
       {/* Fixed Header Section */}
-      <div className="bg-white shadow-sm border-b border-gray-200 pt-20 sticky top-16 z-40">
+      <div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
           <nav className="flex mb-6" aria-label="Breadcrumb">
