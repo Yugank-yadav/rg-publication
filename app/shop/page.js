@@ -508,38 +508,36 @@ export default function ShopPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("class");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [initialFiltersApplied, setInitialFiltersApplied] = useState(false);
 
-  // Apply initial filters from URL parameters
+  // Apply filters from URL parameters whenever they change
   useEffect(() => {
-    if (!initialFiltersApplied) {
-      const subject = searchParams.get("subject");
-      const classParam = searchParams.get("class");
+    const subject = searchParams.get("subject");
+    const classParam = searchParams.get("class");
 
-      if (subject || classParam) {
-        setFilters((prev) => {
-          const newFilters = { ...prev };
+    // Start with clean filter state for navigation-driven filtering
+    const newFilters = {
+      subjects: [],
+      classes: [],
+      types: [],
+      priceRange: [200, 500],
+    };
 
-          // Apply subject filter
-          if (subject && !newFilters.subjects.includes(subject)) {
-            newFilters.subjects = [subject];
-          }
-
-          // Apply class filter
-          if (classParam) {
-            const classNum = parseInt(classParam);
-            if (!newFilters.classes.includes(classNum)) {
-              newFilters.classes = [classNum];
-            }
-          }
-
-          return newFilters;
-        });
-      }
-
-      setInitialFiltersApplied(true);
+    // Apply subject filter if present in URL
+    if (subject) {
+      newFilters.subjects = [subject];
     }
-  }, [searchParams, initialFiltersApplied]);
+
+    // Apply class filter if present in URL
+    if (classParam) {
+      const classNum = parseInt(classParam);
+      if (!isNaN(classNum)) {
+        newFilters.classes = [classNum];
+      }
+    }
+
+    // Update filters state
+    setFilters(newFilters);
+  }, [searchParams]);
 
   // Filter and search logic
   useEffect(() => {
