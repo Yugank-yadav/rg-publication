@@ -591,44 +591,40 @@ export default function ShopPage() {
       <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
-          <nav className="flex mb-6" aria-label="Breadcrumb">
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
-              <li className="inline-flex items-center">
-                <Link
-                  href="/"
-                  className="text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <div className="flex items-center">
-                  <span className="mx-2 text-gray-400">/</span>
-                  <span className="text-gray-900 font-medium">Shop</span>
-                </div>
-              </li>
-            </ol>
-          </nav>
 
           {/* Header */}
-          <div className="text-center mb-8">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-4xl font-bold text-gray-900 mb-4"
-            >
-              Educational Book Shop
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-gray-600 max-w-3xl mx-auto"
-            >
-              Discover our comprehensive collection of Mathematics and Science
-              textbooks designed for students from Class 5 to Class 12.
-            </motion.p>
-          </div>
+          <section className="relative bg-gradient-to-br from-blue-50/30 via-white to-cyan-50/20 py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center">
+                <motion.h1
+                  className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  Educational{" "}
+                  <span
+                    className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-400"
+                    style={{
+                      backgroundImage: `linear-gradient(135deg, #3b82f6 0%, #a8f1ff 100%)`,
+                    }}
+                  >
+                    Book Shop
+                  </span>
+                </motion.h1>
+                <motion.p
+                  className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                >
+                  Discover our comprehensive collection of Mathematics and
+                  Science textbooks designed for students from Class 5 to Class
+                  12.
+                </motion.p>
+              </div>
+            </div>
+          </section>
 
           {/* Search and Sort Bar */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
