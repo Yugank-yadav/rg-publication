@@ -678,9 +678,9 @@ export default function ShopPage() {
 
       {/* Main Layout Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-6 py-6">
           {/* Desktop Sticky Sidebar */}
-          <div className="hidden lg:block w-80 sticky top-80 h-fit">
+          <div className="hidden lg:block w-72 sticky top-80 h-fit">
             <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900">Filters</h3>
@@ -929,22 +929,22 @@ export default function ShopPage() {
           {/* Main Content Area - Scrollable */}
           <div className="flex-1 lg:max-h-screen lg:overflow-hidden">
             <div
-              className="lg:h-screen lg:overflow-y-auto lg:pr-4"
+              className="lg:h-screen lg:overflow-y-auto lg:pr-2"
               style={{ maxHeight: "calc(100vh - 200px)" }}
             >
               {/* Results Header */}
-              <div className="flex items-center justify-between mb-6 sticky top-0 bg-gray-50 py-4 z-10">
+              <div className="flex items-center justify-between mb-4 sticky top-0 bg-gray-50 py-3 z-10">
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-gray-600 font-medium"
+                  className="text-gray-600 text-sm"
                 >
                   Showing{" "}
-                  <span className="font-bold text-gray-900">
+                  <span className="font-semibold text-gray-900">
                     {filteredBooks.length}
                   </span>{" "}
                   of{" "}
-                  <span className="font-bold text-gray-900">
+                  <span className="font-semibold text-gray-900">
                     {sampleBooks.length}
                   </span>{" "}
                   books
@@ -952,66 +952,63 @@ export default function ShopPage() {
               </div>
 
               {/* Books Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-6">
                 {filteredBooks.map((book, index) => (
                   <motion.div
                     key={book.id}
                     layout
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                    transition={{ delay: index * 0.05 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ delay: index * 0.02 }}
                     whileHover={{
-                      scale: 1.03,
-                      rotateY: 3,
+                      scale: 1.02,
+                      y: -2,
                       transition: { duration: 0.2 },
                     }}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 max-w-sm mx-auto border border-gray-100"
+                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200"
                   >
                     {/* Book Cover */}
                     <div
-                      className={`h-52 flex items-center justify-center text-7xl relative overflow-hidden ${
+                      className={`h-36 flex items-center justify-center text-4xl relative overflow-hidden ${
                         book.subject === "Mathematics"
                           ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
                           : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
                       }`}
                     >
-                      <div className="absolute inset-0 bg-white bg-opacity-20"></div>
-                      <span className="relative z-10 drop-shadow-lg">
+                      <div className="absolute inset-0 bg-white bg-opacity-10"></div>
+                      <span className="relative z-10 drop-shadow-sm">
                         {book.image}
                       </span>
                     </div>
 
                     {/* Book Details */}
-                    <div className="p-6">
+                    <div className="p-4">
                       {/* Subject and Class Tags */}
-                      <div className="flex items-center gap-2 mb-4 flex-wrap">
+                      <div className="flex items-center gap-1 mb-3 flex-wrap">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
                             book.subject === "Mathematics"
-                              ? "bg-blue-100 text-blue-800 border border-blue-200"
-                              : "bg-green-100 text-green-800 border border-green-200"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-green-100 text-green-700"
                           }`}
                         >
                           {book.subject}
                         </span>
-                        <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold border border-gray-200">
+                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
                           Class {book.class}
-                        </span>
-                        <span className="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-medium border border-gray-200">
-                          {book.type}
                         </span>
                       </div>
 
                       {/* Book Title */}
-                      <h3 className="text-lg font-bold text-gray-900 mb-4 leading-tight">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-3 leading-tight line-clamp-2">
                         {book.title}
                       </h3>
 
                       {/* Price */}
-                      <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center justify-between mb-4">
                         <span
-                          className="text-3xl font-bold"
+                          className="text-xl font-bold"
                           style={{ color: "#a8f1ff" }}
                         >
                           ₹{book.price}
@@ -1019,21 +1016,21 @@ export default function ShopPage() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex gap-3">
+                      <div className="flex gap-2">
                         <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
                         >
-                          <ShoppingCartIcon className="h-4 w-4" />
+                          <ShoppingCartIcon className="h-3 w-3" />
                           Add to Cart
                         </motion.button>
                         <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="px-4 py-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-lg transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="px-3 py-2 border border-gray-300 hover:border-gray-400 text-gray-600 rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
                         >
-                          <EyeIcon className="h-4 w-4" />
+                          <EyeIcon className="h-3 w-3" />
                         </motion.button>
                       </div>
                     </div>
@@ -1046,21 +1043,21 @@ export default function ShopPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-16"
+                  className="text-center py-12"
                 >
-                  <div className="text-8xl mb-6">📚</div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  <div className="text-6xl mb-4">📚</div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
                     No books found
                   </h3>
-                  <p className="text-gray-600 mb-6 text-lg">
+                  <p className="text-gray-600 mb-4">
                     Try adjusting your filters or search query to find more
                     books.
                   </p>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={clearAllFilters}
-                    className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
                   >
                     Clear All Filters
                   </motion.button>
