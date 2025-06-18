@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
@@ -496,6 +497,7 @@ const sampleBooks = [
 ];
 
 export default function ShopPage() {
+  const searchParams = useSearchParams();
   const [filteredBooks, setFilteredBooks] = useState(sampleBooks);
   const [filters, setFilters] = useState({
     subjects: [],
@@ -506,6 +508,38 @@ export default function ShopPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("class");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [initialFiltersApplied, setInitialFiltersApplied] = useState(false);
+
+  // Apply initial filters from URL parameters
+  useEffect(() => {
+    if (!initialFiltersApplied) {
+      const subject = searchParams.get("subject");
+      const classParam = searchParams.get("class");
+
+      if (subject || classParam) {
+        setFilters((prev) => {
+          const newFilters = { ...prev };
+
+          // Apply subject filter
+          if (subject && !newFilters.subjects.includes(subject)) {
+            newFilters.subjects = [subject];
+          }
+
+          // Apply class filter
+          if (classParam) {
+            const classNum = parseInt(classParam);
+            if (!newFilters.classes.includes(classNum)) {
+              newFilters.classes = [classNum];
+            }
+          }
+
+          return newFilters;
+        });
+      }
+
+      setInitialFiltersApplied(true);
+    }
+  }, [searchParams, initialFiltersApplied]);
 
   // Filter and search logic
   useEffect(() => {
@@ -949,6 +983,77 @@ export default function ShopPage() {
                   </motion.p>
                 </div>
 
+                {/* Active Filters Display - Desktop */}
+                {(filters.subjects.length > 0 ||
+                  filters.classes.length > 0 ||
+                  filters.types.length > 0) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-semibold text-blue-900">
+                        Active Filters:
+                      </h4>
+                      <button
+                        onClick={clearAllFilters}
+                        className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {filters.subjects.map((subject) => (
+                        <span
+                          key={subject}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                        >
+                          {subject}
+                          <button
+                            onClick={() =>
+                              handleFilterChange("subjects", subject)
+                            }
+                            className="hover:bg-blue-200 rounded-full p-0.5"
+                          >
+                            <XMarkIcon className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                      {filters.classes.map((classNum) => (
+                        <span
+                          key={classNum}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                        >
+                          Class {classNum}
+                          <button
+                            onClick={() =>
+                              handleFilterChange("classes", classNum)
+                            }
+                            className="hover:bg-green-200 rounded-full p-0.5"
+                          >
+                            <XMarkIcon className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                      {filters.types.map((type) => (
+                        <span
+                          key={type}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full"
+                        >
+                          {type}
+                          <button
+                            onClick={() => handleFilterChange("types", type)}
+                            className="hover:bg-purple-200 rounded-full p-0.5"
+                          >
+                            <XMarkIcon className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Books Grid - Desktop */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8 mb-8">
                   {filteredBooks.map((book, index) => (
@@ -1083,6 +1188,77 @@ export default function ShopPage() {
                     books
                   </motion.p>
                 </div>
+
+                {/* Active Filters Display - Mobile */}
+                {(filters.subjects.length > 0 ||
+                  filters.classes.length > 0 ||
+                  filters.types.length > 0) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-semibold text-blue-900">
+                        Active Filters:
+                      </h4>
+                      <button
+                        onClick={clearAllFilters}
+                        className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {filters.subjects.map((subject) => (
+                        <span
+                          key={subject}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                        >
+                          {subject}
+                          <button
+                            onClick={() =>
+                              handleFilterChange("subjects", subject)
+                            }
+                            className="hover:bg-blue-200 rounded-full p-0.5"
+                          >
+                            <XMarkIcon className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                      {filters.classes.map((classNum) => (
+                        <span
+                          key={classNum}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                        >
+                          Class {classNum}
+                          <button
+                            onClick={() =>
+                              handleFilterChange("classes", classNum)
+                            }
+                            className="hover:bg-green-200 rounded-full p-0.5"
+                          >
+                            <XMarkIcon className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                      {filters.types.map((type) => (
+                        <span
+                          key={type}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full"
+                        >
+                          {type}
+                          <button
+                            onClick={() => handleFilterChange("types", type)}
+                            className="hover:bg-purple-200 rounded-full p-0.5"
+                          >
+                            <XMarkIcon className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Books Grid - Mobile */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-16 mb-16">

@@ -111,7 +111,7 @@ function ShopDropdownTab({ isActive, className = "" }) {
             {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
               <Link
                 key={`math-${classNum}`}
-                href={`/shop/math/class-${classNum}`}
+                href={`/shop?subject=Mathematics&class=${classNum}`}
                 className="text-xs px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-center transition-colors"
               >
                 Class {classNum}
@@ -132,7 +132,7 @@ function ShopDropdownTab({ isActive, className = "" }) {
             {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
               <Link
                 key={`science-${classNum}`}
-                href={`/shop/science/class-${classNum}`}
+                href={`/shop?subject=Science&class=${classNum}`}
                 className="text-xs px-2 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded text-center transition-colors"
               >
                 Class {classNum}
@@ -264,7 +264,7 @@ function MobileShopTab({ isActive, className = "" }) {
                 {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
                   <Link
                     key={`mobile-math-${classNum}`}
-                    href={`/shop/math/class-${classNum}`}
+                    href={`/shop?subject=Mathematics&class=${classNum}`}
                     onClick={handleSubItemClick}
                     className="text-xs px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-center transition-colors"
                   >
@@ -286,7 +286,7 @@ function MobileShopTab({ isActive, className = "" }) {
                 {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
                   <Link
                     key={`mobile-science-${classNum}`}
-                    href={`/shop/science/class-${classNum}`}
+                    href={`/shop?subject=Science&class=${classNum}`}
                     onClick={handleSubItemClick}
                     className="text-xs px-2 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded text-center transition-colors"
                   >
