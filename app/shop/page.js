@@ -585,10 +585,10 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50 pb-8">
       <style jsx>{sliderStyles}</style>
       {/* Fixed Header Section */}
-      <div>
+      <div className="bg-white shadow-sm border-b border-gray-200 pt-20 lg:sticky lg:top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
           <nav className="flex mb-6" aria-label="Breadcrumb">
@@ -677,7 +677,7 @@ export default function ShopPage() {
       </div>
 
       {/* Main Layout Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="flex flex-col lg:flex-row gap-6 py-6">
           {/* Desktop Sticky Sidebar */}
           <div className="hidden lg:block w-72 sticky top-80 h-fit">
@@ -844,7 +844,7 @@ export default function ShopPage() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="lg:hidden bg-white rounded-lg shadow-lg p-6 mb-6"
+                className="lg:hidden bg-white rounded-lg shadow-lg p-6 mb-6 mx-4 sm:mx-0"
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">
@@ -926,14 +926,14 @@ export default function ShopPage() {
             )}
           </AnimatePresence>
 
-          {/* Main Content Area - Scrollable */}
-          <div className="flex-1 lg:max-h-screen lg:overflow-hidden">
+          {/* Main Content Area */}
+          <div className="flex-1">
             <div
-              className="lg:h-screen lg:overflow-y-auto lg:pr-2"
+              className="lg:max-h-screen lg:overflow-y-auto lg:pr-2"
               style={{ maxHeight: "calc(100vh - 200px)" }}
             >
               {/* Results Header */}
-              <div className="flex items-center justify-between mb-4 sticky top-0 bg-gray-50 py-3 z-10">
+              <div className="flex items-center justify-between mb-4 lg:sticky lg:top-0 bg-gray-50 py-3 z-10">
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -952,7 +952,7 @@ export default function ShopPage() {
               </div>
 
               {/* Books Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8 mb-8">
                 {filteredBooks.map((book, index) => (
                   <motion.div
                     key={book.id}
