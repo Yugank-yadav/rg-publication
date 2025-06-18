@@ -588,7 +588,7 @@ export default function ShopPage() {
     <div className="bg-gray-50 pb-8">
       <style jsx>{sliderStyles}</style>
       {/* Fixed Header Section */}
-      <div className="bg-white shadow-sm border-b border-gray-200 pt-20 lg:sticky lg:top-16 z-40">
+      <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
           <nav className="flex mb-6" aria-label="Breadcrumb">
@@ -928,141 +928,279 @@ export default function ShopPage() {
 
           {/* Main Content Area */}
           <div className="flex-1">
-            <div
-              className="lg:max-h-screen lg:overflow-y-auto lg:pr-2"
-              style={{ maxHeight: "calc(100vh - 200px)" }}
-            >
-              {/* Results Header */}
-              <div className="flex items-center justify-between mb-4 lg:sticky lg:top-0 bg-gray-50 py-3 z-10">
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-gray-600 text-sm"
-                >
-                  Showing{" "}
-                  <span className="font-semibold text-gray-900">
-                    {filteredBooks.length}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-semibold text-gray-900">
-                    {sampleBooks.length}
-                  </span>{" "}
-                  books
-                </motion.p>
-              </div>
-
-              {/* Books Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8 mb-8">
-                {filteredBooks.map((book, index) => (
-                  <motion.div
-                    key={book.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    transition={{ delay: index * 0.02 }}
-                    whileHover={{
-                      scale: 1.02,
-                      y: -2,
-                      transition: { duration: 0.2 },
-                    }}
-                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200"
+            <div className="lg:pr-2">
+              {/* Desktop Scrollable Container */}
+              <div
+                className="hidden lg:block lg:max-h-screen lg:overflow-y-auto"
+                style={{ maxHeight: "calc(100vh - 200px)" }}
+              >
+                {/* Results Header */}
+                <div className="flex items-center justify-between mb-4 sticky top-0 bg-gray-50 py-3 z-10">
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-gray-600 text-sm"
                   >
-                    {/* Book Cover */}
-                    <div
-                      className={`h-36 flex items-center justify-center text-4xl relative overflow-hidden ${
-                        book.subject === "Mathematics"
-                          ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
-                          : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
-                      }`}
+                    Showing{" "}
+                    <span className="font-semibold text-gray-900">
+                      {filteredBooks.length}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-semibold text-gray-900">
+                      {sampleBooks.length}
+                    </span>{" "}
+                    books
+                  </motion.p>
+                </div>
+
+                {/* Books Grid - Desktop */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8 mb-8">
+                  {filteredBooks.map((book, index) => (
+                    <motion.div
+                      key={book.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                      transition={{ delay: index * 0.02 }}
+                      whileHover={{
+                        scale: 1.02,
+                        y: -2,
+                        transition: { duration: 0.2 },
+                      }}
+                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200"
                     >
-                      <div className="absolute inset-0 bg-white bg-opacity-10"></div>
-                      <span className="relative z-10 drop-shadow-sm">
-                        {book.image}
-                      </span>
-                    </div>
-
-                    {/* Book Details */}
-                    <div className="p-4">
-                      {/* Subject and Class Tags */}
-                      <div className="flex items-center gap-1 mb-3 flex-wrap">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            book.subject === "Mathematics"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-green-100 text-green-700"
-                          }`}
-                        >
-                          {book.subject}
-                        </span>
-                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                          Class {book.class}
+                      {/* Book Cover */}
+                      <div
+                        className={`h-36 flex items-center justify-center text-4xl relative overflow-hidden ${
+                          book.subject === "Mathematics"
+                            ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
+                            : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
+                        }`}
+                      >
+                        <div className="absolute inset-0 bg-white bg-opacity-10"></div>
+                        <span className="relative z-10 drop-shadow-sm">
+                          {book.image}
                         </span>
                       </div>
 
-                      {/* Book Title */}
-                      <h3 className="text-sm font-semibold text-gray-900 mb-3 leading-tight line-clamp-2">
-                        {book.title}
-                      </h3>
+                      {/* Book Details */}
+                      <div className="p-4">
+                        {/* Subject and Class Tags */}
+                        <div className="flex items-center gap-1 mb-3 flex-wrap">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              book.subject === "Mathematics"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-green-100 text-green-700"
+                            }`}
+                          >
+                            {book.subject}
+                          </span>
+                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                            Class {book.class}
+                          </span>
+                        </div>
 
-                      {/* Price */}
-                      <div className="flex items-center justify-between mb-4">
-                        <span
-                          className="text-xl font-bold"
-                          style={{ color: "#a8f1ff" }}
-                        >
-                          ₹{book.price}
-                        </span>
-                      </div>
+                        {/* Book Title */}
+                        <h3 className="text-sm font-semibold text-gray-900 mb-3 leading-tight line-clamp-2">
+                          {book.title}
+                        </h3>
 
-                      {/* Action Buttons */}
-                      <div className="flex gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
-                        >
-                          <ShoppingCartIcon className="h-3 w-3" />
-                          Add to Cart
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="px-3 py-2 border border-gray-300 hover:border-gray-400 text-gray-600 rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
-                        >
-                          <EyeIcon className="h-3 w-3" />
-                        </motion.button>
+                        {/* Price */}
+                        <div className="flex items-center justify-between mb-4">
+                          <span
+                            className="text-xl font-bold"
+                            style={{ color: "#a8f1ff" }}
+                          >
+                            ₹{book.price}
+                          </span>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
+                          >
+                            <ShoppingCartIcon className="h-3 w-3" />
+                            Add to Cart
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="px-3 py-2 border border-gray-300 hover:border-gray-400 text-gray-600 rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
+                          >
+                            <EyeIcon className="h-3 w-3" />
+                          </motion.button>
+                        </div>
                       </div>
-                    </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* No Results - Desktop */}
+                {filteredBooks.length === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-12"
+                  >
+                    <div className="text-6xl mb-4">📚</div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      No books found
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Try adjusting your filters or search query to find more
+                      books.
+                    </p>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={clearAllFilters}
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      Clear All Filters
+                    </motion.button>
                   </motion.div>
-                ))}
+                )}
               </div>
 
-              {/* No Results */}
-              {filteredBooks.length === 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-12"
-                >
-                  <div className="text-6xl mb-4">📚</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    No books found
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Try adjusting your filters or search query to find more
-                    books.
-                  </p>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={clearAllFilters}
-                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+              {/* Mobile/Tablet Natural Flow Container */}
+              <div className="lg:hidden">
+                {/* Results Header */}
+                <div className="flex items-center justify-between mb-4 bg-gray-50 py-3">
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-gray-600 text-sm"
                   >
-                    Clear All Filters
-                  </motion.button>
-                </motion.div>
-              )}
+                    Showing{" "}
+                    <span className="font-semibold text-gray-900">
+                      {filteredBooks.length}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-semibold text-gray-900">
+                      {sampleBooks.length}
+                    </span>{" "}
+                    books
+                  </motion.p>
+                </div>
+
+                {/* Books Grid - Mobile */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-16 mb-16">
+                  {filteredBooks.map((book, index) => (
+                    <motion.div
+                      key={book.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                      transition={{ delay: index * 0.02 }}
+                      whileHover={{
+                        scale: 1.02,
+                        y: -2,
+                        transition: { duration: 0.2 },
+                      }}
+                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200"
+                    >
+                      {/* Book Cover */}
+                      <div
+                        className={`h-36 flex items-center justify-center text-4xl relative overflow-hidden ${
+                          book.subject === "Mathematics"
+                            ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
+                            : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
+                        }`}
+                      >
+                        <div className="absolute inset-0 bg-white bg-opacity-10"></div>
+                        <span className="relative z-10 drop-shadow-sm">
+                          {book.image}
+                        </span>
+                      </div>
+
+                      {/* Book Details */}
+                      <div className="p-4">
+                        {/* Subject and Class Tags */}
+                        <div className="flex items-center gap-1 mb-3 flex-wrap">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              book.subject === "Mathematics"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-green-100 text-green-700"
+                            }`}
+                          >
+                            {book.subject}
+                          </span>
+                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                            Class {book.class}
+                          </span>
+                        </div>
+
+                        {/* Book Title */}
+                        <h3 className="text-sm font-semibold text-gray-900 mb-3 leading-tight line-clamp-2">
+                          {book.title}
+                        </h3>
+
+                        {/* Price */}
+                        <div className="flex items-center justify-between mb-4">
+                          <span
+                            className="text-xl font-bold"
+                            style={{ color: "#a8f1ff" }}
+                          >
+                            ₹{book.price}
+                          </span>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
+                          >
+                            <ShoppingCartIcon className="h-3 w-3" />
+                            Add to Cart
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="px-3 py-2 border border-gray-300 hover:border-gray-400 text-gray-600 rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
+                          >
+                            <EyeIcon className="h-3 w-3" />
+                          </motion.button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* No Results */}
+                {filteredBooks.length === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-12"
+                  >
+                    <div className="text-6xl mb-4">📚</div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      No books found
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Try adjusting your filters or search query to find more
+                      books.
+                    </p>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={clearAllFilters}
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      Clear All Filters
+                    </motion.button>
+                  </motion.div>
+                )}
+              </div>
             </div>
           </div>
         </div>
