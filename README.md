@@ -33,11 +33,38 @@ A modern, interactive educational books and resources website built with Next.js
 - **SEO Optimized**: Proper meta tags and semantic HTML
 - **Production Ready**: Zero build errors, optimized for deployment
 
+### 🔗 Featured Collections Navigation
+
+- **Smart Navigation**: Homepage buttons navigate to shop with pre-applied filters
+- **URL Parameters**: `/shop?featured=bestseller`, `/shop?featured=trending`, `/shop?featured=new-arrival`
+- **Filter Synchronization**: Shop page automatically reads URL parameters and applies filters
+- **Visual Consistency**: Featured badge colors match between homepage and shop page
+- **Responsive Design**: Works seamlessly across all device sizes
+
 ## 🛠️ Tech Stack
 
 - **Framework**: Next.js 15.3.3
 - **Styling**: Tailwind CSS
 - **Animations**: Framer Motion
+
+## 📚 API Documentation
+
+This project includes comprehensive API documentation for backend integration:
+
+- **File**: `RG_Publication_API_Documentation.md`
+- **Endpoints**: 45+ RESTful API endpoints
+- **Features**: Authentication, Product Management, Shopping Cart, Orders, Search & Filter
+- **Token System**: Non-expiring JWT tokens for seamless user experience
+- **Database Schema**: Complete SQL schemas for all entities
+- **Implementation Guide**: Phase-wise development plan with priorities
+
+### Key API Features
+
+- **Featured Collections**: Full support for bestseller, trending, new-arrival filtering
+- **Cart Synchronization**: localStorage integration with backend persistence
+- **Search System**: Advanced product search with suggestions and analytics
+- **User Management**: Complete authentication and profile management
+- **Order Processing**: End-to-end order management with payment integration
 - **Icons**: Heroicons
 - **Images**: Next.js Image with Unsplash integration
 - **Deployment**: Vercel (recommended)

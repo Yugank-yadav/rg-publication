@@ -9,12 +9,12 @@ import {
   XMarkIcon,
   MagnifyingGlassIcon,
   AdjustmentsHorizontalIcon,
+  HeartIcon,
 } from "@heroicons/react/24/outline";
 import {
   CalculatorIcon,
   BeakerIcon,
   ShoppingCartIcon,
-  EyeIcon,
 } from "@heroicons/react/16/solid";
 
 // Metadata is handled by layout.js for client components
@@ -54,6 +54,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 250,
     image: "📐",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 2,
@@ -63,6 +64,7 @@ const sampleBooks = [
     type: "Practice Book",
     price: 180,
     image: "📐",
+    featured: "trending", // Featured in Trending section
   },
   {
     id: 3,
@@ -72,6 +74,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 300,
     image: "📐",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
 
   {
@@ -82,6 +85,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 270,
     image: "📐",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 5,
@@ -91,6 +95,7 @@ const sampleBooks = [
     type: "Practice Book",
     price: 200,
     image: "📐",
+    featured: null, // Not featured
   },
   {
     id: 6,
@@ -100,6 +105,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 320,
     image: "📐",
+    featured: "trending", // Featured in Trending section
   },
 
   {
@@ -110,6 +116,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 290,
     image: "📐",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
   {
     id: 8,
@@ -119,6 +126,7 @@ const sampleBooks = [
     type: "Practice Book",
     price: 220,
     image: "📐",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 9,
@@ -128,6 +136,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 340,
     image: "📐",
+    featured: null, // Not featured
   },
 
   {
@@ -138,6 +147,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 310,
     image: "📐",
+    featured: "trending", // Featured in Trending section
   },
   {
     id: 11,
@@ -147,6 +157,7 @@ const sampleBooks = [
     type: "Practice Book",
     price: 240,
     image: "📐",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 12,
@@ -156,6 +167,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 360,
     image: "📐",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
 
   {
@@ -166,6 +178,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 330,
     image: "📐",
+    featured: "trending", // Featured in Trending section
   },
   {
     id: 14,
@@ -175,6 +188,7 @@ const sampleBooks = [
     type: "Practice Book",
     price: 260,
     image: "📐",
+    featured: null, // Not featured
   },
   {
     id: 15,
@@ -184,6 +198,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 380,
     image: "📐",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
 
   {
@@ -194,6 +209,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 350,
     image: "📐",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 17,
@@ -203,6 +219,7 @@ const sampleBooks = [
     type: "Practice Book",
     price: 280,
     image: "📐",
+    featured: null, // Not featured
   },
   {
     id: 18,
@@ -212,6 +229,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 400,
     image: "📐",
+    featured: null, // Not featured
   },
 
   {
@@ -222,6 +240,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 420,
     image: "📐",
+    featured: "trending", // Featured in Trending section
   },
   {
     id: 20,
@@ -231,6 +250,7 @@ const sampleBooks = [
     type: "Practice Book",
     price: 320,
     image: "📐",
+    featured: null, // Not featured
   },
   {
     id: 21,
@@ -240,6 +260,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 450,
     image: "📐",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
 
   {
@@ -250,6 +271,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 450,
     image: "📐",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 23,
@@ -259,6 +281,7 @@ const sampleBooks = [
     type: "Practice Book",
     price: 350,
     image: "📐",
+    featured: null, // Not featured
   },
   {
     id: 24,
@@ -268,6 +291,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 480,
     image: "📐",
+    featured: null, // Not featured
   },
 
   // Science Books
@@ -279,6 +303,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 240,
     image: "🔬",
+    featured: "trending", // Featured in Trending section
   },
   {
     id: 26,
@@ -288,6 +313,7 @@ const sampleBooks = [
     type: "Lab Manual",
     price: 160,
     image: "🔬",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
   {
     id: 27,
@@ -297,6 +323,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 290,
     image: "🔬",
+    featured: "bestseller", // Featured in Best Selling section
   },
 
   {
@@ -307,6 +334,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 260,
     image: "🔬",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 29,
@@ -316,6 +344,7 @@ const sampleBooks = [
     type: "Lab Manual",
     price: 180,
     image: "🔬",
+    featured: null, // Not featured
   },
   {
     id: 30,
@@ -325,6 +354,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 310,
     image: "🔬",
+    featured: "trending", // Featured in Trending section
   },
 
   {
@@ -335,6 +365,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 280,
     image: "🔬",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
   {
     id: 32,
@@ -344,6 +375,7 @@ const sampleBooks = [
     type: "Lab Manual",
     price: 200,
     image: "🔬",
+    featured: "trending", // Featured in Trending section
   },
   {
     id: 33,
@@ -353,6 +385,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 330,
     image: "🔬",
+    featured: null, // Not featured
   },
 
   {
@@ -363,6 +396,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 300,
     image: "🔬",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 35,
@@ -372,6 +406,7 @@ const sampleBooks = [
     type: "Lab Manual",
     price: 220,
     image: "🔬",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
   {
     id: 36,
@@ -381,6 +416,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 350,
     image: "🔬",
+    featured: null, // Not featured
   },
 
   {
@@ -391,6 +427,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 320,
     image: "🔬",
+    featured: "trending", // Featured in Trending section
   },
   {
     id: 38,
@@ -400,6 +437,7 @@ const sampleBooks = [
     type: "Lab Manual",
     price: 240,
     image: "🔬",
+    featured: null, // Not featured
   },
   {
     id: 39,
@@ -409,6 +447,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 370,
     image: "🔬",
+    featured: null, // Not featured
   },
 
   {
@@ -419,6 +458,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 380,
     image: "🔬",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 41,
@@ -428,6 +468,7 @@ const sampleBooks = [
     type: "Lab Manual",
     price: 280,
     image: "🔬",
+    featured: null, // Not featured
   },
   {
     id: 42,
@@ -437,6 +478,7 @@ const sampleBooks = [
     type: "Advanced Guide",
     price: 420,
     image: "🔬",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
 
   {
@@ -447,6 +489,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 420,
     image: "🔬",
+    featured: "trending", // Featured in Trending section
   },
   {
     id: 44,
@@ -456,6 +499,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 400,
     image: "🔬",
+    featured: "bestseller", // Featured in Best Selling section
   },
   {
     id: 45,
@@ -465,6 +509,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 390,
     image: "🔬",
+    featured: null, // Not featured
   },
 
   {
@@ -475,6 +520,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 450,
     image: "🔬",
+    featured: "new-arrival", // Featured in New Arrivals section
   },
   {
     id: 47,
@@ -484,6 +530,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 430,
     image: "🔬",
+    featured: "trending", // Featured in Trending section
   },
   {
     id: 48,
@@ -493,6 +540,7 @@ const sampleBooks = [
     type: "Textbook",
     price: 420,
     image: "🔬",
+    featured: "bestseller", // Featured in Best Selling section
   },
 ];
 
@@ -504,15 +552,18 @@ function ShopContent() {
     classes: [],
     types: [],
     priceRange: [200, 500],
+    featured: "", // New featured filter: "", "bestseller", "trending", "new-arrival"
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("class");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [wishlistedItems, setWishlistedItems] = useState(new Set());
 
   // Apply filters from URL parameters whenever they change
   useEffect(() => {
     const subject = searchParams.get("subject");
     const classParam = searchParams.get("class");
+    const featured = searchParams.get("featured");
 
     // Start with clean filter state for navigation-driven filtering
     const newFilters = {
@@ -520,6 +571,7 @@ function ShopContent() {
       classes: [],
       types: [],
       priceRange: [200, 500],
+      featured: "",
     };
 
     // Apply subject filter if present in URL
@@ -533,6 +585,14 @@ function ShopContent() {
       if (!isNaN(classNum)) {
         newFilters.classes = [classNum];
       }
+    }
+
+    // Apply featured filter if present in URL
+    if (
+      featured &&
+      ["bestseller", "trending", "new-arrival"].includes(featured)
+    ) {
+      newFilters.featured = featured;
     }
 
     // Update filters state
@@ -568,6 +628,11 @@ function ShopContent() {
         book.price >= filters.priceRange[0] &&
         book.price <= filters.priceRange[1]
     );
+
+    // Apply featured filter
+    if (filters.featured) {
+      filtered = filtered.filter((book) => book.featured === filters.featured);
+    }
 
     // Apply search query
     if (searchQuery) {
@@ -612,8 +677,22 @@ function ShopContent() {
       classes: [],
       types: [],
       priceRange: [200, 500],
+      featured: "",
     });
     setSearchQuery("");
+  };
+
+  // Wishlist toggle function
+  const toggleWishlist = (bookId) => {
+    setWishlistedItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(bookId)) {
+        newSet.delete(bookId);
+      } else {
+        newSet.add(bookId);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -765,6 +844,33 @@ function ShopContent() {
                 </div>
               </div>
 
+              {/* Featured Collections Filter */}
+              <div className="mb-8">
+                <h4 className="font-semibold text-gray-900 mb-4 text-lg">
+                  Featured Collections
+                </h4>
+                <div className="space-y-3">
+                  <select
+                    value={filters.featured}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        featured: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent shadow-sm transition-all duration-200 bg-white"
+                    style={{
+                      "--tw-ring-color": "#a8f1ff",
+                    }}
+                  >
+                    <option value="">All Products</option>
+                    <option value="bestseller">Best Selling Books</option>
+                    <option value="trending">Trending Products</option>
+                    <option value="new-arrival">New Arrivals</option>
+                  </select>
+                </div>
+              </div>
+
               {/* Class Filter */}
               <div className="mb-8">
                 <h4 className="font-semibold text-gray-900 mb-4 text-lg">
@@ -888,6 +994,31 @@ function ShopContent() {
 
                 {/* Mobile filter content - same as desktop but in mobile layout */}
                 <div className="space-y-6">
+                  {/* Featured Collections Filter */}
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      Featured Collections
+                    </h4>
+                    <select
+                      value={filters.featured}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          featured: e.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent bg-white"
+                      style={{
+                        "--tw-ring-color": "#a8f1ff",
+                      }}
+                    >
+                      <option value="">All Products</option>
+                      <option value="bestseller">Best Selling Books</option>
+                      <option value="trending">Trending Products</option>
+                      <option value="new-arrival">New Arrivals</option>
+                    </select>
+                  </div>
+
                   {/* Subject Filter */}
                   <div>
                     <h4 className="font-medium text-gray-900 mb-3">Subject</h4>
@@ -984,7 +1115,8 @@ function ShopContent() {
                 {/* Active Filters Display - Desktop */}
                 {(filters.subjects.length > 0 ||
                   filters.classes.length > 0 ||
-                  filters.types.length > 0) && (
+                  filters.types.length > 0 ||
+                  filters.featured) && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -1048,6 +1180,25 @@ function ShopContent() {
                           </button>
                         </span>
                       ))}
+                      {filters.featured && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+                          {filters.featured === "bestseller"
+                            ? "🏆 Best Selling Books"
+                            : filters.featured === "trending"
+                            ? "🔥 Trending Products"
+                            : filters.featured === "new-arrival"
+                            ? "✨ New Arrivals"
+                            : "Featured"}
+                          <button
+                            onClick={() =>
+                              setFilters((prev) => ({ ...prev, featured: "" }))
+                            }
+                            className="hover:bg-orange-200 rounded-full p-0.5"
+                          >
+                            <XMarkIcon className="h-3 w-3" />
+                          </button>
+                        </span>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -1067,74 +1218,115 @@ function ShopContent() {
                         y: -2,
                         transition: { duration: 0.2 },
                       }}
-                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200"
+                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 cursor-pointer"
                     >
-                      {/* Book Cover */}
-                      <div
-                        className={`h-36 flex items-center justify-center text-4xl relative overflow-hidden ${
-                          book.subject === "Mathematics"
-                            ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
-                            : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
-                        }`}
-                      >
-                        <div className="absolute inset-0 bg-white bg-opacity-10"></div>
-                        <span className="relative z-10 drop-shadow-sm">
-                          {book.image}
-                        </span>
-                      </div>
+                      <Link href={`/shop/${book.id}`} className="block">
+                        {/* Book Cover */}
+                        <div
+                          className={`h-36 flex items-center justify-center text-4xl relative overflow-hidden ${
+                            book.subject === "Mathematics"
+                              ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
+                              : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
+                          }`}
+                        >
+                          <div className="absolute inset-0 bg-white bg-opacity-10"></div>
+                          <span className="relative z-10 drop-shadow-sm">
+                            {book.image}
+                          </span>
 
-                      {/* Book Details */}
-                      <div className="p-4">
-                        {/* Subject and Class Tags */}
-                        <div className="flex items-center gap-1 mb-3 flex-wrap">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              book.subject === "Mathematics"
-                                ? "bg-blue-100 text-blue-700"
-                                : "bg-green-100 text-green-700"
-                            }`}
-                          >
-                            {book.subject}
-                          </span>
-                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                            Class {book.class}
-                          </span>
+                          {/* Featured Badge */}
+                          {book.featured && (
+                            <div className="absolute top-2 right-2 z-20">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-bold text-white shadow-lg ${
+                                  book.featured === "bestseller"
+                                    ? "bg-gradient-to-r from-blue-600 to-cyan-400"
+                                    : book.featured === "trending"
+                                    ? "bg-gradient-to-r from-orange-500 to-red-500"
+                                    : book.featured === "new-arrival"
+                                    ? "bg-gradient-to-r from-purple-500 to-indigo-500"
+                                    : "bg-gray-500"
+                                }`}
+                              >
+                                {book.featured === "bestseller"
+                                  ? "🏆 Best Seller"
+                                  : book.featured === "trending"
+                                  ? "🔥 Trending"
+                                  : book.featured === "new-arrival"
+                                  ? "✨ New"
+                                  : "Featured"}
+                              </span>
+                            </div>
+                          )}
                         </div>
 
-                        {/* Book Title */}
-                        <h3 className="text-sm font-semibold text-gray-900 mb-3 leading-tight line-clamp-2">
-                          {book.title}
-                        </h3>
+                        {/* Book Details */}
+                        <div className="p-4">
+                          {/* Subject and Class Tags */}
+                          <div className="flex items-center gap-1 mb-3 flex-wrap">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                book.subject === "Mathematics"
+                                  ? "bg-blue-100 text-blue-700"
+                                  : "bg-green-100 text-green-700"
+                              }`}
+                            >
+                              {book.subject}
+                            </span>
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                              Class {book.class}
+                            </span>
+                          </div>
 
-                        {/* Price */}
-                        <div className="flex items-center justify-between mb-4">
-                          <span
-                            className="text-xl font-bold"
-                            style={{ color: "#a8f1ff" }}
-                          >
-                            ₹{book.price}
-                          </span>
-                        </div>
+                          {/* Book Title */}
+                          <h3 className="text-sm font-semibold text-gray-900 mb-3 leading-tight line-clamp-2">
+                            {book.title}
+                          </h3>
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-2">
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
-                          >
-                            <ShoppingCartIcon className="h-3 w-3" />
-                            Add to Cart
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="px-3 py-2 border border-gray-300 hover:border-gray-400 text-gray-600 rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
-                          >
-                            <EyeIcon className="h-3 w-3" />
-                          </motion.button>
+                          {/* Price */}
+                          <div className="flex items-center justify-between mb-4">
+                            <span
+                              className="text-xl font-bold"
+                              style={{ color: "#a8f1ff" }}
+                            >
+                              ₹{book.price}
+                            </span>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-2">
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                // Add to cart logic here
+                              }}
+                              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
+                            >
+                              <ShoppingCartIcon className="h-3 w-3" />
+                              Add to Cart
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                toggleWishlist(book.id);
+                              }}
+                              className={`px-3 py-2 border rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md ${
+                                wishlistedItems.has(book.id)
+                                  ? "border-red-300 bg-red-50 text-red-600 hover:border-red-400"
+                                  : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+                              }`}
+                            >
+                              <HeartIcon className="h-3 w-3" />
+                            </motion.button>
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     </motion.div>
                   ))}
                 </div>
@@ -1190,7 +1382,8 @@ function ShopContent() {
                 {/* Active Filters Display - Mobile */}
                 {(filters.subjects.length > 0 ||
                   filters.classes.length > 0 ||
-                  filters.types.length > 0) && (
+                  filters.types.length > 0 ||
+                  filters.featured) && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -1254,6 +1447,25 @@ function ShopContent() {
                           </button>
                         </span>
                       ))}
+                      {filters.featured && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+                          {filters.featured === "bestseller"
+                            ? "🏆 Best Selling Books"
+                            : filters.featured === "trending"
+                            ? "🔥 Trending Products"
+                            : filters.featured === "new-arrival"
+                            ? "✨ New Arrivals"
+                            : "Featured"}
+                          <button
+                            onClick={() =>
+                              setFilters((prev) => ({ ...prev, featured: "" }))
+                            }
+                            className="hover:bg-orange-200 rounded-full p-0.5"
+                          >
+                            <XMarkIcon className="h-3 w-3" />
+                          </button>
+                        </span>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -1273,74 +1485,115 @@ function ShopContent() {
                         y: -2,
                         transition: { duration: 0.2 },
                       }}
-                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200"
+                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 cursor-pointer"
                     >
-                      {/* Book Cover */}
-                      <div
-                        className={`h-36 flex items-center justify-center text-4xl relative overflow-hidden ${
-                          book.subject === "Mathematics"
-                            ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
-                            : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
-                        }`}
-                      >
-                        <div className="absolute inset-0 bg-white bg-opacity-10"></div>
-                        <span className="relative z-10 drop-shadow-sm">
-                          {book.image}
-                        </span>
-                      </div>
+                      <Link href={`/shop/${book.id}`} className="block">
+                        {/* Book Cover */}
+                        <div
+                          className={`h-36 flex items-center justify-center text-4xl relative overflow-hidden ${
+                            book.subject === "Mathematics"
+                              ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
+                              : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
+                          }`}
+                        >
+                          <div className="absolute inset-0 bg-white bg-opacity-10"></div>
+                          <span className="relative z-10 drop-shadow-sm">
+                            {book.image}
+                          </span>
 
-                      {/* Book Details */}
-                      <div className="p-4">
-                        {/* Subject and Class Tags */}
-                        <div className="flex items-center gap-1 mb-3 flex-wrap">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              book.subject === "Mathematics"
-                                ? "bg-blue-100 text-blue-700"
-                                : "bg-green-100 text-green-700"
-                            }`}
-                          >
-                            {book.subject}
-                          </span>
-                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                            Class {book.class}
-                          </span>
+                          {/* Featured Badge */}
+                          {book.featured && (
+                            <div className="absolute top-2 right-2 z-20">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-bold text-white shadow-lg ${
+                                  book.featured === "bestseller"
+                                    ? "bg-gradient-to-r from-blue-600 to-cyan-400"
+                                    : book.featured === "trending"
+                                    ? "bg-gradient-to-r from-orange-500 to-red-500"
+                                    : book.featured === "new-arrival"
+                                    ? "bg-gradient-to-r from-purple-500 to-indigo-500"
+                                    : "bg-gray-500"
+                                }`}
+                              >
+                                {book.featured === "bestseller"
+                                  ? "🏆 Best Seller"
+                                  : book.featured === "trending"
+                                  ? "🔥 Trending"
+                                  : book.featured === "new-arrival"
+                                  ? "✨ New"
+                                  : "Featured"}
+                              </span>
+                            </div>
+                          )}
                         </div>
 
-                        {/* Book Title */}
-                        <h3 className="text-sm font-semibold text-gray-900 mb-3 leading-tight line-clamp-2">
-                          {book.title}
-                        </h3>
+                        {/* Book Details */}
+                        <div className="p-4">
+                          {/* Subject and Class Tags */}
+                          <div className="flex items-center gap-1 mb-3 flex-wrap">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                book.subject === "Mathematics"
+                                  ? "bg-blue-100 text-blue-700"
+                                  : "bg-green-100 text-green-700"
+                              }`}
+                            >
+                              {book.subject}
+                            </span>
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                              Class {book.class}
+                            </span>
+                          </div>
 
-                        {/* Price */}
-                        <div className="flex items-center justify-between mb-4">
-                          <span
-                            className="text-xl font-bold"
-                            style={{ color: "#a8f1ff" }}
-                          >
-                            ₹{book.price}
-                          </span>
-                        </div>
+                          {/* Book Title */}
+                          <h3 className="text-sm font-semibold text-gray-900 mb-3 leading-tight line-clamp-2">
+                            {book.title}
+                          </h3>
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-2">
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
-                          >
-                            <ShoppingCartIcon className="h-3 w-3" />
-                            Add to Cart
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="px-3 py-2 border border-gray-300 hover:border-gray-400 text-gray-600 rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
-                          >
-                            <EyeIcon className="h-3 w-3" />
-                          </motion.button>
+                          {/* Price */}
+                          <div className="flex items-center justify-between mb-4">
+                            <span
+                              className="text-xl font-bold"
+                              style={{ color: "#a8f1ff" }}
+                            >
+                              ₹{book.price}
+                            </span>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-2">
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                // Add to cart logic here
+                              }}
+                              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
+                            >
+                              <ShoppingCartIcon className="h-3 w-3" />
+                              Add to Cart
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                toggleWishlist(book.id);
+                              }}
+                              className={`px-3 py-2 border rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md ${
+                                wishlistedItems.has(book.id)
+                                  ? "border-red-300 bg-red-50 text-red-600 hover:border-red-400"
+                                  : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+                              }`}
+                            >
+                              <HeartIcon className="h-3 w-3" />
+                            </motion.button>
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     </motion.div>
                   ))}
                 </div>

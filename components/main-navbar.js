@@ -11,6 +11,7 @@ import {
   DropdownItem,
   DropdownLabel,
   DropdownMenu,
+  DropdownContext,
 } from "./dropdown";
 import {
   Navbar,
@@ -33,7 +34,11 @@ import {
   BeakerIcon,
   ShoppingBagIcon,
 } from "@heroicons/react/16/solid";
-import { InboxIcon, MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import {
+  ShoppingCartIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/20/solid";
+import { useCart } from "@/contexts/CartContext";
 
 // Custom animated tab component for desktop with sliding underline and bounce
 function AnimatedTab({ children, isActive, href, className = "" }) {
@@ -65,6 +70,72 @@ function AnimatedTab({ children, isActive, href, className = "" }) {
         )}
       </motion.div>
     </Link>
+  );
+}
+
+// Shop dropdown content component that has access to DropdownContext
+function ShopDropdownContent() {
+  const { setIsOpen } = useContext(DropdownContext);
+
+  // Handle click on dropdown navigation items to auto-close dropdown
+  const handleNavItemClick = () => {
+    setIsOpen(false);
+  };
+
+  return (
+    <DropdownMenu className="min-w-80" anchor="bottom start">
+      {/* Mathematics Section */}
+      <div className="px-3 py-2">
+        <div className="flex items-center gap-2 mb-2">
+          <CalculatorIcon className="h-4 w-4 text-blue-500" />
+          <DropdownLabel className="font-semibold">Mathematics</DropdownLabel>
+        </div>
+        <div className="grid grid-cols-4 gap-1 ml-6">
+          {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
+            <Link
+              key={`math-${classNum}`}
+              href={`/shop?subject=Mathematics&class=${classNum}`}
+              onClick={handleNavItemClick}
+              className="text-xs px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-center transition-colors"
+            >
+              Class {classNum}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <DropdownDivider />
+
+      {/* Science Section */}
+      <div className="px-3 py-2">
+        <div className="flex items-center gap-2 mb-2">
+          <BeakerIcon className="h-4 w-4 text-green-500" />
+          <DropdownLabel className="font-semibold">Science</DropdownLabel>
+        </div>
+        <div className="grid grid-cols-4 gap-1 ml-6">
+          {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
+            <Link
+              key={`science-${classNum}`}
+              href={`/shop?subject=Science&class=${classNum}`}
+              onClick={handleNavItemClick}
+              className="text-xs px-2 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded text-center transition-colors"
+            >
+              Class {classNum}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <DropdownDivider />
+
+      {/* All Books Link */}
+      <DropdownItem>
+        <Link href="/shop" className="flex items-center gap-2 w-full">
+          <ShoppingBagIcon className="h-4 w-4" style={{ color: "#a8f1ff" }} />
+          <DropdownLabel>View All Books</DropdownLabel>
+        </Link>
+      </DropdownItem>
+    </DropdownMenu>
   );
 }
 
@@ -100,57 +171,7 @@ function ShopDropdownTab({ isActive, className = "" }) {
           )}
         </motion.div>
       </DropdownButton>
-      <DropdownMenu className="min-w-80" anchor="bottom start">
-        {/* Mathematics Section */}
-        <div className="px-3 py-2">
-          <div className="flex items-center gap-2 mb-2">
-            <CalculatorIcon className="h-4 w-4 text-blue-500" />
-            <DropdownLabel className="font-semibold">Mathematics</DropdownLabel>
-          </div>
-          <div className="grid grid-cols-4 gap-1 ml-6">
-            {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
-              <Link
-                key={`math-${classNum}`}
-                href={`/shop?subject=Mathematics&class=${classNum}`}
-                className="text-xs px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-center transition-colors"
-              >
-                Class {classNum}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <DropdownDivider />
-
-        {/* Science Section */}
-        <div className="px-3 py-2">
-          <div className="flex items-center gap-2 mb-2">
-            <BeakerIcon className="h-4 w-4 text-green-500" />
-            <DropdownLabel className="font-semibold">Science</DropdownLabel>
-          </div>
-          <div className="grid grid-cols-4 gap-1 ml-6">
-            {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
-              <Link
-                key={`science-${classNum}`}
-                href={`/shop?subject=Science&class=${classNum}`}
-                className="text-xs px-2 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded text-center transition-colors"
-              >
-                Class {classNum}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <DropdownDivider />
-
-        {/* All Books Link */}
-        <DropdownItem>
-          <Link href="/shop" className="flex items-center gap-2 w-full">
-            <ShoppingBagIcon className="h-4 w-4" style={{ color: "#a8f1ff" }} />
-            <DropdownLabel>View All Books</DropdownLabel>
-          </Link>
-        </DropdownItem>
-      </DropdownMenu>
+      <ShopDropdownContent />
     </Dropdown>
   );
 }
@@ -319,6 +340,8 @@ function MobileShopTab({ isActive, className = "" }) {
 
 export default function MainNavbar() {
   const pathname = usePathname();
+  const { getCartTotals } = useCart();
+  const { itemCount } = getCartTotals();
 
   // Navigation items with proper routes
   const navItems = [
@@ -447,10 +470,19 @@ export default function MainNavbar() {
       {/* Right side - Actions and user menu */}
       <NavbarSection>
         <NavbarItem aria-label="Search">
-          <MagnifyingGlassIcon className="h-5 w-5" />
+          <Link href="/search">
+            <MagnifyingGlassIcon className="h-5 w-5" />
+          </Link>
         </NavbarItem>
-        <NavbarItem aria-label="Inbox">
-          <InboxIcon className="h-5 w-5" />
+        <NavbarItem aria-label="Shopping Cart">
+          <Link href="/cart" className="relative">
+            <ShoppingCartIcon className="h-5 w-5" />
+            {itemCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                {itemCount > 99 ? "99+" : itemCount}
+              </span>
+            )}
+          </Link>
         </NavbarItem>
 
         {/* User dropdown */}
@@ -460,8 +492,10 @@ export default function MainNavbar() {
           </DropdownButton>
           <DropdownMenu className="min-w-64" anchor="bottom end">
             <DropdownItem>
-              <UserIcon className="h-4 w-4 text-gray-500" />
-              <DropdownLabel>My profile</DropdownLabel>
+              <Link href="/profile" className="flex items-center gap-2 w-full">
+                <UserIcon className="h-4 w-4 text-gray-500" />
+                <DropdownLabel>My profile</DropdownLabel>
+              </Link>
             </DropdownItem>
             <DropdownItem>
               <Cog8ToothIcon className="h-4 w-4 text-gray-500" />

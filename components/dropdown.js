@@ -146,4 +146,5 @@ export {
   DropdownItem,
   DropdownLabel,
   DropdownDivider,
+  DropdownContext,
 };

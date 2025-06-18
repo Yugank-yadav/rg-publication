@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import {
   ArrowRightIcon,
   StarIcon,
@@ -206,113 +207,127 @@ export default function TrendingProducts() {
               variants={bookVariants}
               className="group relative"
             >
-              <motion.div
-                className="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-100"
-                whileHover={{
-                  y: -8,
-                  scale: 1.02,
-                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                }}
-                transition={{
-                  type: "spring",
-                  damping: 20,
-                  stiffness: 300,
-                }}
-              >
-                {/* Book Cover */}
-                <div className="relative h-64 overflow-hidden">
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full h-full"
-                  >
-                    <Image
-                      src={book.coverImage}
-                      alt={`${book.title} book cover`}
-                      width={300}
-                      height={400}
-                      className="w-full h-full object-cover"
-                    />
-                  </motion.div>
-
-                  {/* Trending Badge */}
-                  <div className="absolute top-4 left-4">
+              <Link href={`/shop/${book.id}`} className="block">
+                <motion.div
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-100 cursor-pointer"
+                  whileHover={{
+                    y: -8,
+                    scale: 1.02,
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                  }}
+                  transition={{
+                    type: "spring",
+                    damping: 20,
+                    stiffness: 300,
+                  }}
+                >
+                  {/* Book Cover */}
+                  <div className="relative h-64 overflow-hidden">
                     <motion.div
-                      className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full"
-                      animate={{
-                        scale: [1, 1.05, 1],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-full h-full"
                     >
-                      <FireIcon className="h-3 w-3 text-white" />
-                      <span className="text-xs font-semibold text-white">
-                        Trending
-                      </span>
+                      <Image
+                        src={book.coverImage}
+                        alt={`${book.title} book cover`}
+                        width={300}
+                        height={400}
+                        className="w-full h-full object-cover"
+                      />
                     </motion.div>
-                  </div>
 
-                  {/* Favorite Icon */}
-                  <motion.button
-                    className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <HeartIcon className="h-5 w-5 text-white" />
-                  </motion.button>
-
-                  {/* Category Badge */}
-                  <div className="absolute bottom-4 left-4">
-                    <span
-                      className="px-3 py-1 text-xs font-semibold rounded-full text-gray-800"
-                      style={{ backgroundColor: "#a8f1ff" }}
-                    >
-                      {book.category}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Book Details */}
-                <div className="p-6">
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">
-                    {book.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {book.description}
-                  </p>
-
-                  {/* Rating */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center">
-                      {renderStars(book.rating)}
+                    {/* Trending Badge */}
+                    <div className="absolute top-4 left-4">
+                      <motion.div
+                        className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full"
+                        animate={{
+                          scale: [1, 1.05, 1],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        <FireIcon className="h-3 w-3 text-white" />
+                        <span className="text-xs font-semibold text-white">
+                          Trending
+                        </span>
+                      </motion.div>
                     </div>
-                    <span className="text-sm text-gray-600">
-                      {book.rating} ({book.reviews.toLocaleString()})
-                    </span>
+
+                    {/* Favorite Icon */}
+                    <motion.button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Wishlist logic here
+                        console.log(`Added ${book.title} to wishlist`);
+                      }}
+                      className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <HeartIcon className="h-5 w-5 text-white" />
+                    </motion.button>
+
+                    {/* Category Badge */}
+                    <div className="absolute bottom-4 left-4">
+                      <span
+                        className="px-3 py-1 text-xs font-semibold rounded-full text-gray-800"
+                        style={{ backgroundColor: "#a8f1ff" }}
+                      >
+                        {book.category}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Price and Action */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-gray-900">
-                      {book.price}
-                    </span>
-                    <motion.button
-                      className="px-4 py-2 text-sm font-semibold rounded-lg text-gray-800 transition-all duration-300"
-                      style={{ backgroundColor: "#a8f1ff" }}
-                      whileHover={{
-                        scale: 1.05,
-                        backgroundColor: "#8ee8f7",
-                      }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Add to Cart
-                    </motion.button>
+                  {/* Book Details */}
+                  <div className="p-6">
+                    <h3 className="font-bold text-lg text-gray-900 mb-2">
+                      {book.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                      {book.description}
+                    </p>
+
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center">
+                        {renderStars(book.rating)}
+                      </div>
+                      <span className="text-sm text-gray-600">
+                        {book.rating} ({book.reviews.toLocaleString()})
+                      </span>
+                    </div>
+
+                    {/* Price and Action */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-gray-900">
+                        {book.price}
+                      </span>
+                      <motion.button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          // Add to cart logic here
+                          console.log(`Added ${book.title} to cart`);
+                        }}
+                        className="px-4 py-2 text-sm font-semibold rounded-lg text-gray-800 transition-all duration-300"
+                        style={{ backgroundColor: "#a8f1ff" }}
+                        whileHover={{
+                          scale: 1.05,
+                          backgroundColor: "#8ee8f7",
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Add to Cart
+                      </motion.button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </Link>
             </motion.div>
           ))}
         </motion.div>
@@ -325,18 +340,20 @@ export default function TrendingProducts() {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          <motion.button
-            className="inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
-            style={{ backgroundColor: "#a8f1ff", color: "#1f2937" }}
-            whileHover={{
-              scale: 1.05,
-              y: -2,
-            }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Browse All Trending
-            <ArrowRightIcon className="h-5 w-5" />
-          </motion.button>
+          <Link href="/shop?featured=trending">
+            <motion.button
+              className="inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
+              style={{ backgroundColor: "#a8f1ff", color: "#1f2937" }}
+              whileHover={{
+                scale: 1.05,
+                y: -2,
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Browse All Trending
+              <ArrowRightIcon className="h-5 w-5" />
+            </motion.button>
+          </Link>
         </motion.div>
       </div>
     </section>
