@@ -324,7 +324,6 @@ export default function MainNavbar() {
   const navItems = [
     { id: "home", label: "Home", href: "/" },
     { id: "about", label: "About", href: "/about" },
-    { id: "books", label: "Books", href: "/books" },
     { id: "shop", label: "Shop", href: "/shop" },
     { id: "services", label: "Services", href: "/services" },
     { id: "contact", label: "Contact", href: "/contact" },
@@ -390,7 +389,7 @@ export default function MainNavbar() {
           </DropdownItem>
           <DropdownDivider />
           <DropdownItem>
-            <Link href="/books" className="flex items-center gap-2 w-full">
+            <Link href="/shop" className="flex items-center gap-2 w-full">
               <Avatar src="/next.svg" size="sm" />
               <DropdownLabel>Our Books</DropdownLabel>
             </Link>
