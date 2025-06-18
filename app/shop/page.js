@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -496,7 +496,7 @@ const sampleBooks = [
   },
 ];
 
-export default function ShopPage() {
+function ShopContent() {
   const searchParams = useSearchParams();
   const [filteredBooks, setFilteredBooks] = useState(sampleBooks);
   const [filters, setFilters] = useState({
@@ -1376,5 +1376,60 @@ export default function ShopPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function ShopLoading() {
+  return (
+    <div className="bg-gray-50 pb-8">
+      <div className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <section className="relative bg-gradient-to-br from-blue-50/30 via-white to-cyan-50/20 py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center">
+                <div className="h-12 bg-gray-200 rounded-lg animate-pulse mb-6 mx-auto max-w-md"></div>
+                <div className="h-6 bg-gray-200 rounded-lg animate-pulse mx-auto max-w-2xl"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-6 py-6">
+          <div className="hidden lg:block w-72">
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+              <div className="h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md p-4">
+                  <div className="h-48 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2 w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Main export with Suspense wrapper
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<ShopLoading />}>
+      <ShopContent />
+    </Suspense>
   );
 }
