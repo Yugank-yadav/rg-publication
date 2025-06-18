@@ -18,6 +18,30 @@ import {
 
 // Metadata is handled by layout.js for client components
 
+// Custom styles for the range slider
+const sliderStyles = `
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #a8f1ff;
+    cursor: pointer;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .slider::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #a8f1ff;
+    cursor: pointer;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+`;
+
 // Sample book data
 const sampleBooks = [
   // Mathematics Books
@@ -561,177 +585,253 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumb */}
-        <nav className="flex mb-6" aria-label="Breadcrumb">
-          <ol className="inline-flex items-center space-x-1 md:space-x-3">
-            <li className="inline-flex items-center">
-              <Link href="/" className="text-gray-700 hover:text-gray-900">
-                Home
-              </Link>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <span className="mx-2 text-gray-400">/</span>
-                <span className="text-gray-900 font-medium">Shop</span>
-              </div>
-            </li>
-          </ol>
-        </nav>
+    <div className="min-h-screen bg-gray-50">
+      <style jsx>{sliderStyles}</style>
+      {/* Fixed Header Section */}
+      <div className="bg-white shadow-sm border-b border-gray-200 pt-20 sticky top-16 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Breadcrumb */}
+          <nav className="flex mb-6" aria-label="Breadcrumb">
+            <ol className="inline-flex items-center space-x-1 md:space-x-3">
+              <li className="inline-flex items-center">
+                <Link
+                  href="/"
+                  className="text-gray-700 hover:text-gray-900 transition-colors"
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <div className="flex items-center">
+                  <span className="mx-2 text-gray-400">/</span>
+                  <span className="text-gray-900 font-medium">Shop</span>
+                </div>
+              </li>
+            </ol>
+          </nav>
 
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Educational Book Shop
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover our comprehensive collection of Mathematics and Science
-            textbooks designed for students from Class 5 to Class 12.
-          </p>
-        </div>
-
-        {/* Search and Sort Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          {/* Search */}
-          <div className="flex-1 relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search books..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+          {/* Header */}
+          <div className="text-center mb-8">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-4xl font-bold text-gray-900 mb-4"
+            >
+              Educational Book Shop
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-xl text-gray-600 max-w-3xl mx-auto"
+            >
+              Discover our comprehensive collection of Mathematics and Science
+              textbooks designed for students from Class 5 to Class 12.
+            </motion.p>
           </div>
 
-          {/* Sort */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="class">Sort by Class</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="alphabetical">Alphabetical</option>
-          </select>
+          {/* Search and Sort Bar */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search books by title, subject, or type..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent shadow-sm transition-all duration-200"
+                style={{
+                  "--tw-ring-color": "#a8f1ff",
+                }}
+              />
+            </div>
 
-          {/* Mobile Filter Toggle */}
-          <button
-            onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-            className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-          >
-            <FunnelIcon className="h-5 w-5" />
-            Filters
-          </button>
+            {/* Sort */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent shadow-sm transition-all duration-200 bg-white"
+              style={{
+                "--tw-ring-color": "#a8f1ff",
+              }}
+            >
+              <option value="class">Sort by Class</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="alphabetical">Alphabetical</option>
+            </select>
+
+            {/* Mobile Filter Toggle */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+              className="lg:hidden flex items-center gap-2 px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-sm transition-all duration-200"
+            >
+              <FunnelIcon className="h-5 w-5" />
+              Filters
+            </motion.button>
+          </div>
         </div>
+      </div>
 
-        {/* Main Layout */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Desktop Sidebar */}
-          <div className="hidden lg:block w-80 bg-white rounded-lg shadow-lg p-6 h-fit">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
-              <button
-                onClick={clearAllFilters}
-                className="text-sm text-blue-600 hover:text-blue-800"
-              >
-                Clear All
-              </button>
-            </div>
+      {/* Main Layout Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-8 py-8">
+          {/* Desktop Sticky Sidebar */}
+          <div className="hidden lg:block w-80 sticky top-80 h-fit">
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Filters</h3>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={clearAllFilters}
+                  className="text-sm font-medium px-3 py-1 rounded-lg transition-colors"
+                  style={{
+                    color: "#a8f1ff",
+                    backgroundColor: "rgba(168, 241, 255, 0.1)",
+                  }}
+                >
+                  Clear All
+                </motion.button>
+              </div>
 
-            {/* Subject Filter */}
-            <div className="mb-6">
-              <h4 className="font-medium text-gray-900 mb-3">Subject</h4>
-              <div className="space-y-2">
-                <label className="flex items-center">
+              {/* Subject Filter */}
+              <div className="mb-8">
+                <h4 className="font-semibold text-gray-900 mb-4 text-lg">
+                  Subject
+                </h4>
+                <div className="space-y-3">
+                  <motion.label
+                    whileHover={{ scale: 1.02 }}
+                    className="flex items-center p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.subjects.includes("Mathematics")}
+                      onChange={() =>
+                        handleFilterChange("subjects", "Mathematics")
+                      }
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
+                    />
+                    <CalculatorIcon className="h-5 w-5 text-blue-500 ml-3 mr-3" />
+                    <span className="text-gray-700 font-medium">
+                      Mathematics
+                    </span>
+                  </motion.label>
+                  <motion.label
+                    whileHover={{ scale: 1.02 }}
+                    className="flex items-center p-3 rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-all duration-200 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.subjects.includes("Science")}
+                      onChange={() => handleFilterChange("subjects", "Science")}
+                      className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-4 h-4"
+                    />
+                    <BeakerIcon className="h-5 w-5 text-green-500 ml-3 mr-3" />
+                    <span className="text-gray-700 font-medium">Science</span>
+                  </motion.label>
+                </div>
+              </div>
+
+              {/* Class Filter */}
+              <div className="mb-8">
+                <h4 className="font-semibold text-gray-900 mb-4 text-lg">
+                  Class Level
+                </h4>
+                <div className="grid grid-cols-4 gap-2">
+                  {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
+                    <motion.label
+                      key={classNum}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="flex items-center justify-center p-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={filters.classes.includes(classNum)}
+                        onChange={() => handleFilterChange("classes", classNum)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2 w-3 h-3"
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        {classNum}
+                      </span>
+                    </motion.label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Book Type Filter */}
+              <div className="mb-8">
+                <h4 className="font-semibold text-gray-900 mb-4 text-lg">
+                  Book Type
+                </h4>
+                <div className="space-y-3">
+                  {[
+                    "Textbook",
+                    "Practice Book",
+                    "Lab Manual",
+                    "Advanced Guide",
+                  ].map((type) => (
+                    <motion.label
+                      key={type}
+                      whileHover={{ scale: 1.02 }}
+                      className="flex items-center p-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={filters.types.includes(type)}
+                        onChange={() => handleFilterChange("types", type)}
+                        className="rounded border-gray-300 focus:ring-2 w-4 h-4"
+                        style={{
+                          color: "#a8f1ff",
+                          "--tw-ring-color": "#a8f1ff",
+                        }}
+                      />
+                      <span className="text-gray-700 ml-3 font-medium">
+                        {type}
+                      </span>
+                    </motion.label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div className="mb-6">
+                <h4 className="font-semibold text-gray-900 mb-4 text-lg">
+                  Price Range
+                </h4>
+                <div className="px-3">
                   <input
-                    type="checkbox"
-                    checked={filters.subjects.includes("Mathematics")}
-                    onChange={() =>
-                      handleFilterChange("subjects", "Mathematics")
+                    type="range"
+                    min="200"
+                    max="500"
+                    value={filters.priceRange[1]}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        priceRange: [200, parseInt(e.target.value)],
+                      }))
                     }
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, #a8f1ff 0%, #a8f1ff ${
+                        ((filters.priceRange[1] - 200) / 300) * 100
+                      }%, #e5e7eb ${
+                        ((filters.priceRange[1] - 200) / 300) * 100
+                      }%, #e5e7eb 100%)`,
+                    }}
                   />
-                  <CalculatorIcon className="h-4 w-4 text-blue-500 ml-2 mr-2" />
-                  <span className="text-gray-700">Mathematics</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={filters.subjects.includes("Science")}
-                    onChange={() => handleFilterChange("subjects", "Science")}
-                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  />
-                  <BeakerIcon className="h-4 w-4 text-green-500 ml-2 mr-2" />
-                  <span className="text-gray-700">Science</span>
-                </label>
-              </div>
-            </div>
-
-            {/* Class Filter */}
-            <div className="mb-6">
-              <h4 className="font-medium text-gray-900 mb-3">Class Level</h4>
-              <div className="grid grid-cols-4 gap-2">
-                {[5, 6, 7, 8, 9, 10, 11, 12].map((classNum) => (
-                  <label key={classNum} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={filters.classes.includes(classNum)}
-                      onChange={() => handleFilterChange("classes", classNum)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-1"
-                    />
-                    <span className="text-sm text-gray-700">{classNum}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Book Type Filter */}
-            <div className="mb-6">
-              <h4 className="font-medium text-gray-900 mb-3">Book Type</h4>
-              <div className="space-y-2">
-                {[
-                  "Textbook",
-                  "Practice Book",
-                  "Lab Manual",
-                  "Advanced Guide",
-                ].map((type) => (
-                  <label key={type} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={filters.types.includes(type)}
-                      onChange={() => handleFilterChange("types", type)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-gray-700 ml-2">{type}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Price Range */}
-            <div className="mb-6">
-              <h4 className="font-medium text-gray-900 mb-3">Price Range</h4>
-              <div className="px-2">
-                <input
-                  type="range"
-                  min="200"
-                  max="500"
-                  value={filters.priceRange[1]}
-                  onChange={(e) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      priceRange: [200, parseInt(e.target.value)],
-                    }))
-                  }
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
-                  <span>₹200</span>
-                  <span>₹{filters.priceRange[1]}</span>
-                  <span>₹500</span>
+                  <div className="flex justify-between text-sm text-gray-600 mt-2">
+                    <span className="font-medium">₹200</span>
+                    <span className="font-bold" style={{ color: "#a8f1ff" }}>
+                      ₹{filters.priceRange[1]}
+                    </span>
+                    <span className="font-medium">₹500</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -826,119 +926,147 @@ export default function ShopPage() {
             )}
           </AnimatePresence>
 
-          {/* Main Content Area */}
-          <div className="flex-1">
-            {/* Results Header */}
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-gray-600">
-                Showing {filteredBooks.length} of {sampleBooks.length} books
-              </p>
-            </div>
-
-            {/* Books Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredBooks.map((book) => (
-                <motion.div
-                  key={book.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  whileHover={{
-                    scale: 1.02,
-                    rotateY: 2,
-                    transition: { duration: 0.2 },
-                  }}
-                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 max-w-sm mx-auto"
+          {/* Main Content Area - Scrollable */}
+          <div className="flex-1 lg:max-h-screen lg:overflow-hidden">
+            <div
+              className="lg:h-screen lg:overflow-y-auto lg:pr-4"
+              style={{ maxHeight: "calc(100vh - 200px)" }}
+            >
+              {/* Results Header */}
+              <div className="flex items-center justify-between mb-6 sticky top-0 bg-gray-50 py-4 z-10">
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-gray-600 font-medium"
                 >
-                  {/* Book Cover */}
-                  <div
-                    className={`h-48 flex items-center justify-center text-6xl ${
-                      book.subject === "Mathematics"
-                        ? "bg-gradient-to-br from-blue-100 to-blue-200"
-                        : "bg-gradient-to-br from-green-100 to-green-200"
-                    }`}
-                  >
-                    {book.image}
-                  </div>
-
-                  {/* Book Details */}
-                  <div className="p-6">
-                    {/* Subject and Class Tags */}
-                    <div className="flex items-center gap-2 mb-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          book.subject === "Mathematics"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-green-100 text-green-800"
-                        }`}
-                      >
-                        {book.subject}
-                      </span>
-                      <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
-                        Class {book.class}
-                      </span>
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                        {book.type}
-                      </span>
-                    </div>
-
-                    {/* Book Title */}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">
-                      {book.title}
-                    </h3>
-
-                    {/* Price */}
-                    <div className="flex items-center justify-between mb-4">
-                      <span
-                        className="text-2xl font-bold"
-                        style={{ color: "#a8f1ff" }}
-                      >
-                        ₹{book.price}
-                      </span>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                      >
-                        <ShoppingCartIcon className="h-4 w-4" />
-                        Add to Cart
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="px-4 py-2 border border-gray-300 hover:border-gray-400 text-gray-700 rounded-lg transition-colors flex items-center justify-center"
-                      >
-                        <EyeIcon className="h-4 w-4" />
-                      </motion.button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* No Results */}
-            {filteredBooks.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">📚</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  No books found
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Try adjusting your filters or search query to find more books.
-                </p>
-                <button
-                  onClick={clearAllFilters}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  Clear All Filters
-                </button>
+                  Showing{" "}
+                  <span className="font-bold text-gray-900">
+                    {filteredBooks.length}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-bold text-gray-900">
+                    {sampleBooks.length}
+                  </span>{" "}
+                  books
+                </motion.p>
               </div>
-            )}
+
+              {/* Books Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
+                {filteredBooks.map((book, index) => (
+                  <motion.div
+                    key={book.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                    transition={{ delay: index * 0.05 }}
+                    whileHover={{
+                      scale: 1.03,
+                      rotateY: 3,
+                      transition: { duration: 0.2 },
+                    }}
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 max-w-sm mx-auto border border-gray-100"
+                  >
+                    {/* Book Cover */}
+                    <div
+                      className={`h-52 flex items-center justify-center text-7xl relative overflow-hidden ${
+                        book.subject === "Mathematics"
+                          ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
+                          : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
+                      }`}
+                    >
+                      <div className="absolute inset-0 bg-white bg-opacity-20"></div>
+                      <span className="relative z-10 drop-shadow-lg">
+                        {book.image}
+                      </span>
+                    </div>
+
+                    {/* Book Details */}
+                    <div className="p-6">
+                      {/* Subject and Class Tags */}
+                      <div className="flex items-center gap-2 mb-4 flex-wrap">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            book.subject === "Mathematics"
+                              ? "bg-blue-100 text-blue-800 border border-blue-200"
+                              : "bg-green-100 text-green-800 border border-green-200"
+                          }`}
+                        >
+                          {book.subject}
+                        </span>
+                        <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold border border-gray-200">
+                          Class {book.class}
+                        </span>
+                        <span className="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-medium border border-gray-200">
+                          {book.type}
+                        </span>
+                      </div>
+
+                      {/* Book Title */}
+                      <h3 className="text-lg font-bold text-gray-900 mb-4 leading-tight">
+                        {book.title}
+                      </h3>
+
+                      {/* Price */}
+                      <div className="flex items-center justify-between mb-6">
+                        <span
+                          className="text-3xl font-bold"
+                          style={{ color: "#a8f1ff" }}
+                        >
+                          ₹{book.price}
+                        </span>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-3">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                        >
+                          <ShoppingCartIcon className="h-4 w-4" />
+                          Add to Cart
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="px-4 py-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-lg transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
+                        >
+                          <EyeIcon className="h-4 w-4" />
+                        </motion.button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* No Results */}
+              {filteredBooks.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-16"
+                >
+                  <div className="text-8xl mb-6">📚</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                    No books found
+                  </h3>
+                  <p className="text-gray-600 mb-6 text-lg">
+                    Try adjusting your filters or search query to find more
+                    books.
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={clearAllFilters}
+                    className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    Clear All Filters
+                  </motion.button>
+                </motion.div>
+              )}
+            </div>
           </div>
         </div>
       </div>
