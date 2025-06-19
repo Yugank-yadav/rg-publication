@@ -510,7 +510,8 @@ export default function SearchPage() {
                   <div className="flex items-center justify-between mb-6">
                     <p className="text-gray-600">
                       Found {searchResults.length} result
-                      {searchResults.length !== 1 ? &apos;s&apos; : &apos;&apos;} for &quot;{query}&quot;
+                      {searchResults.length !== 1 ? "s" : ""} for &quot;{query}
+                      &quot;
                     </p>
                   </div>
                   <div className="space-y-4">
@@ -532,8 +533,8 @@ export default function SearchPage() {
                     No results found
                   </h3>
                   <p className="text-gray-600 mb-6">
-                    We couldn&apos;t find any books matching &quot;{query}&quot;. Try adjusting
-                    your search or filters.
+                    We couldn&apos;t find any books matching &quot;{query}
+                    &quot;. Try adjusting your search or filters.
                   </p>
                   <div className="space-y-4">
                     <button

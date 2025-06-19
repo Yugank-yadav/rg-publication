@@ -2,7 +2,11 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeftIcon, HomeIcon, ShoppingBagIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowLeftIcon,
+  HomeIcon,
+  ShoppingBagIcon,
+} from "@heroicons/react/24/outline";
 
 export default function ProductNotFound() {
   return (
@@ -16,14 +20,15 @@ export default function ProductNotFound() {
         >
           {/* 404 Illustration */}
           <div className="text-8xl mb-8">📚</div>
-          
+
           {/* Error Message */}
           <div className="space-y-4">
             <h1 className="text-4xl font-bold text-gray-900">
               Product Not Found
             </h1>
             <p className="text-lg text-gray-600">
-              Sorry, we couldn't find the book you're looking for. It might have been moved or doesn't exist.
+              Sorry, we couldn&apos;t find the book you&apos;re looking for. It
+              might have been moved or doesn&apos;t exist.
             </p>
           </div>
 
@@ -39,7 +44,7 @@ export default function ProductNotFound() {
                 <span>Browse All Books</span>
               </motion.button>
             </Link>
-            
+
             <Link href="/">
               <motion.button
                 whileHover={{ scale: 1.02 }}

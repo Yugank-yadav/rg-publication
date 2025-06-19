@@ -322,8 +322,9 @@ export default function CartPage() {
               Your cart is empty
             </h2>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Looks like you haven't added any books to your cart yet. Start
-              browsing our collection to find your perfect study materials!
+              Looks like you haven&apos;t added any books to your cart yet.
+              Start browsing our collection to find your perfect study
+              materials!
             </p>
             <div className="space-y-4">
               <Link
