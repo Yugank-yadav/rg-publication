@@ -9,12 +9,17 @@
 5. [Search & Filter](#search--filter)
 6. [Order Management](#order-management)
 7. [User Profile](#user-profile)
-8. [Content Management](#content-management)
-9. [Analytics & Tracking](#analytics--tracking)
-10. [File Upload](#file-upload)
-11. [Database Schema](#database-schema)
-12. [Implementation Priority](#implementation-priority)
-13. [Security & Performance](#security--performance)
+8. [Wishlist Management](#wishlist-management)
+9. [Product Reviews & Ratings](#product-reviews--ratings)
+10. [Address Management](#address-management)
+11. [Coupon Management](#coupon-management)
+12. [Contact Form](#contact-form)
+13. [Content Management](#content-management)
+14. [Analytics & Tracking](#analytics--tracking)
+15. [File Upload](#file-upload)
+16. [Database Schema](#database-schema)
+17. [Implementation Priority](#implementation-priority)
+18. [Security & Performance](#security--performance)
 
 ---
 
@@ -1313,6 +1318,897 @@ GET /users/orders
 
 ---
 
+## Wishlist Management
+
+### 1. Get User Wishlist
+
+**Priority:** Medium
+
+```http
+GET /users/wishlist
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "wishlist": {
+      "id": "wishlist_1234567890",
+      "userId": "usr_1234567890",
+      "items": [
+        {
+          "id": "wishlist_item_001",
+          "productId": "prod_1234567890",
+          "product": {
+            "id": "prod_1234567890",
+            "title": "Complete Mathematics for Class 10",
+            "price": 350,
+            "originalPrice": 400,
+            "image": "https://cdn.rgpublication.com/products/math-class10-cover.jpg",
+            "subject": "Mathematics",
+            "class": 10,
+            "inStock": true,
+            "rating": 4.8
+          },
+          "addedAt": "2024-01-15T10:30:00Z"
+        }
+      ],
+      "itemCount": 8,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z"
+    }
+  }
+}
+```
+
+### 2. Add Item to Wishlist
+
+**Priority:** Medium
+
+```http
+POST /users/wishlist/items
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "Content-Type": "application/json"
+}
+```
+
+**Request Body:**
+
+```json
+{
+  "productId": "prod_1234567890"
+}
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "success": true,
+  "message": "Item added to wishlist successfully",
+  "data": {
+    "wishlistItem": {
+      "id": "wishlist_item_002",
+      "productId": "prod_1234567890",
+      "addedAt": "2024-01-15T12:00:00Z"
+    },
+    "wishlistSummary": {
+      "itemCount": 9
+    }
+  }
+}
+```
+
+### 3. Remove Item from Wishlist
+
+**Priority:** Medium
+
+```http
+DELETE /users/wishlist/items/{productId}
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Item removed from wishlist successfully",
+  "data": {
+    "wishlistSummary": {
+      "itemCount": 7
+    }
+  }
+}
+```
+
+### 4. Check if Product is in Wishlist
+
+**Priority:** Low
+
+```http
+GET /users/wishlist/check/{productId}
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "inWishlist": true,
+    "addedAt": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+---
+
+## Product Reviews & Ratings
+
+### 1. Get Product Reviews
+
+**Priority:** Medium
+
+```http
+GET /products/{productId}/reviews
+```
+
+**Query Parameters:**
+
+```
+?page=1&limit=10&sortBy=createdAt&sortOrder=desc&rating=5
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "reviews": [
+      {
+        "id": "review_1234567890",
+        "productId": "prod_1234567890",
+        "userId": "usr_1234567890",
+        "user": {
+          "id": "usr_1234567890",
+          "firstName": "John",
+          "lastName": "Doe",
+          "avatar": "https://cdn.rgpublication.com/avatars/user_1234567890.jpg"
+        },
+        "rating": 5,
+        "title": "Excellent Mathematics Book",
+        "comment": "This book helped me understand complex mathematical concepts easily. Highly recommended for Class 10 students.",
+        "verified": true,
+        "helpful": 15,
+        "notHelpful": 2,
+        "createdAt": "2024-01-15T10:30:00Z",
+        "updatedAt": "2024-01-15T10:30:00Z"
+      }
+    ],
+    "summary": {
+      "totalReviews": 1247,
+      "averageRating": 4.8,
+      "ratingDistribution": {
+        "5": 856,
+        "4": 298,
+        "3": 67,
+        "2": 18,
+        "1": 8
+      }
+    },
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 125,
+      "totalItems": 1247,
+      "itemsPerPage": 10
+    }
+  }
+}
+```
+
+### 2. Add Product Review
+
+**Priority:** Medium
+
+```http
+POST /products/{productId}/reviews
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "Content-Type": "application/json"
+}
+```
+
+**Request Body:**
+
+```json
+{
+  "rating": 5,
+  "title": "Excellent Mathematics Book",
+  "comment": "This book helped me understand complex mathematical concepts easily. Highly recommended for Class 10 students."
+}
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "success": true,
+  "message": "Review added successfully",
+  "data": {
+    "review": {
+      "id": "review_1234567890",
+      "productId": "prod_1234567890",
+      "userId": "usr_1234567890",
+      "rating": 5,
+      "title": "Excellent Mathematics Book",
+      "comment": "This book helped me understand complex mathematical concepts easily. Highly recommended for Class 10 students.",
+      "verified": false,
+      "helpful": 0,
+      "notHelpful": 0,
+      "createdAt": "2024-01-15T12:00:00Z"
+    }
+  }
+}
+```
+
+### 3. Update Product Review
+
+**Priority:** Low
+
+```http
+PUT /reviews/{reviewId}
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "Content-Type": "application/json"
+}
+```
+
+**Request Body:**
+
+```json
+{
+  "rating": 4,
+  "title": "Good Mathematics Book",
+  "comment": "Updated review: This book is good for understanding mathematical concepts."
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Review updated successfully",
+  "data": {
+    "review": {
+      "id": "review_1234567890",
+      "rating": 4,
+      "title": "Good Mathematics Book",
+      "comment": "Updated review: This book is good for understanding mathematical concepts.",
+      "updatedAt": "2024-01-15T14:30:00Z"
+    }
+  }
+}
+```
+
+### 4. Delete Product Review
+
+**Priority:** Low
+
+```http
+DELETE /reviews/{reviewId}
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Review deleted successfully"
+}
+```
+
+### 5. Mark Review as Helpful
+
+**Priority:** Low
+
+```http
+POST /reviews/{reviewId}/helpful
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "Content-Type": "application/json"
+}
+```
+
+**Request Body:**
+
+```json
+{
+  "helpful": true
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Review feedback recorded",
+  "data": {
+    "helpful": 16,
+    "notHelpful": 2
+  }
+}
+```
+
+---
+
+## Address Management
+
+### 1. Get User Addresses
+
+**Priority:** Medium
+
+```http
+GET /users/addresses
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "addresses": [
+      {
+        "id": "addr_1234567890",
+        "type": "home",
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.doe@example.com",
+        "phone": "+91-9876543210",
+        "addressLine1": "123 Main Street",
+        "addressLine2": "Apartment 4B",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "postalCode": "400001",
+        "country": "India",
+        "isDefault": true,
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-01-15T10:30:00Z"
+      }
+    ]
+  }
+}
+```
+
+### 2. Add User Address
+
+**Priority:** Medium
+
+```http
+POST /users/addresses
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "Content-Type": "application/json"
+}
+```
+
+**Request Body:**
+
+```json
+{
+  "type": "work",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "+91-9876543210",
+  "addressLine1": "456 Business Park",
+  "addressLine2": "Floor 5, Office 502",
+  "city": "Delhi",
+  "state": "Delhi",
+  "postalCode": "110001",
+  "country": "India",
+  "isDefault": false
+}
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "success": true,
+  "message": "Address added successfully",
+  "data": {
+    "address": {
+      "id": "addr_2345678901",
+      "type": "work",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "+91-9876543210",
+      "addressLine1": "456 Business Park",
+      "addressLine2": "Floor 5, Office 502",
+      "city": "Delhi",
+      "state": "Delhi",
+      "postalCode": "110001",
+      "country": "India",
+      "isDefault": false,
+      "createdAt": "2024-01-15T12:00:00Z"
+    }
+  }
+}
+```
+
+### 3. Update User Address
+
+**Priority:** Medium
+
+```http
+PUT /users/addresses/{addressId}
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "Content-Type": "application/json"
+}
+```
+
+**Request Body:**
+
+```json
+{
+  "type": "home",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+91-9876543211",
+  "addressLine1": "789 New Street",
+  "addressLine2": "Apartment 6C",
+  "city": "Bangalore",
+  "state": "Karnataka",
+  "postalCode": "560001",
+  "isDefault": true
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Address updated successfully",
+  "data": {
+    "address": {
+      "id": "addr_1234567890",
+      "type": "home",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": "+91-9876543211",
+      "addressLine1": "789 New Street",
+      "addressLine2": "Apartment 6C",
+      "city": "Bangalore",
+      "state": "Karnataka",
+      "postalCode": "560001",
+      "isDefault": true,
+      "updatedAt": "2024-01-15T14:30:00Z"
+    }
+  }
+}
+```
+
+### 4. Delete User Address
+
+**Priority:** Medium
+
+```http
+DELETE /users/addresses/{addressId}
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Address deleted successfully"
+}
+```
+
+### 5. Set Default Address
+
+**Priority:** Low
+
+```http
+PUT /users/addresses/{addressId}/default
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Default address updated successfully",
+  "data": {
+    "address": {
+      "id": "addr_1234567890",
+      "isDefault": true,
+      "updatedAt": "2024-01-15T15:00:00Z"
+    }
+  }
+}
+```
+
+---
+
+## Coupon Management
+
+### 1. Validate Coupon
+
+**Priority:** Medium
+
+```http
+GET /coupons/validate/{code}
+```
+
+**Query Parameters:**
+
+```
+?cartTotal=1000
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "coupon": {
+      "id": "coupon_1234567890",
+      "code": "SAVE10",
+      "type": "percentage",
+      "value": 10,
+      "description": "Get 10% off on your order",
+      "minOrderAmount": 500,
+      "maxDiscountAmount": 100,
+      "validFrom": "2024-01-01T00:00:00Z",
+      "validUntil": "2024-12-31T23:59:59Z",
+      "usageLimit": 1000,
+      "usedCount": 245,
+      "isActive": true
+    },
+    "discount": {
+      "amount": 100,
+      "applicable": true,
+      "reason": "Coupon applied successfully"
+    }
+  }
+}
+```
+
+### 2. Apply Coupon to Cart
+
+**Priority:** Medium
+
+```http
+POST /cart/apply-coupon
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "Content-Type": "application/json"
+}
+```
+
+**Request Body:**
+
+```json
+{
+  "couponCode": "SAVE10"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Coupon applied successfully",
+  "data": {
+    "coupon": {
+      "code": "SAVE10",
+      "discount": 100,
+      "description": "Get 10% off on your order"
+    },
+    "cartSummary": {
+      "subtotal": 1000,
+      "discount": 100,
+      "shipping": 0,
+      "tax": 162,
+      "total": 1062,
+      "savings": 100
+    }
+  }
+}
+```
+
+### 3. Remove Coupon from Cart
+
+**Priority:** Medium
+
+```http
+DELETE /cart/remove-coupon
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Coupon removed successfully",
+  "data": {
+    "cartSummary": {
+      "subtotal": 1000,
+      "discount": 0,
+      "shipping": 0,
+      "tax": 180,
+      "total": 1180
+    }
+  }
+}
+```
+
+### 4. Get Available Coupons
+
+**Priority:** Low
+
+```http
+GET /coupons/available
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Query Parameters:**
+
+```
+?cartTotal=1000
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "coupons": [
+      {
+        "id": "coupon_1234567890",
+        "code": "SAVE10",
+        "type": "percentage",
+        "value": 10,
+        "description": "Get 10% off on your order",
+        "minOrderAmount": 500,
+        "maxDiscountAmount": 100,
+        "validUntil": "2024-12-31T23:59:59Z",
+        "applicable": true,
+        "potentialDiscount": 100
+      }
+    ]
+  }
+}
+```
+
+---
+
+## Contact Form
+
+### 1. Submit Contact Form
+
+**Priority:** High (MVP)
+
+```http
+POST /contact/submit
+```
+
+**Request Headers:**
+
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+**Request Body:**
+
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "phone": "+91-9876543210",
+  "subject": "Book Inquiry",
+  "message": "I need information about Class 10 Mathematics books. Do you have the latest edition available?",
+  "type": "general"
+}
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "success": true,
+  "message": "Contact form submitted successfully",
+  "data": {
+    "submission": {
+      "id": "contact_1234567890",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "phone": "+91-9876543210",
+      "subject": "Book Inquiry",
+      "message": "I need information about Class 10 Mathematics books. Do you have the latest edition available?",
+      "type": "general",
+      "status": "pending",
+      "submittedAt": "2024-01-15T12:00:00Z"
+    }
+  }
+}
+```
+
+### 2. Get Contact Submissions (Admin)
+
+**Priority:** Low (Admin)
+
+```http
+GET /contact/submissions
+```
+
+**Request Headers:**
+
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Query Parameters:**
+
+```
+?page=1&limit=20&status=pending&type=general&sortBy=submittedAt&sortOrder=desc
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "submissions": [
+      {
+        "id": "contact_1234567890",
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "phone": "+91-9876543210",
+        "subject": "Book Inquiry",
+        "message": "I need information about Class 10 Mathematics books.",
+        "type": "general",
+        "status": "pending",
+        "submittedAt": "2024-01-15T12:00:00Z"
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 5,
+      "totalItems": 95,
+      "itemsPerPage": 20
+    }
+  }
+}
+```
+
+---
+
 ## Content Management
 
 ### 1. Get Homepage Content
@@ -1691,6 +2587,130 @@ CREATE TABLE cart_items (
 );
 ```
 
+#### Wishlists Table
+
+```sql
+CREATE TABLE wishlists (
+  id VARCHAR(20) PRIMARY KEY,
+  user_id VARCHAR(20) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user_id (user_id)
+);
+```
+
+#### Wishlist Items Table
+
+```sql
+CREATE TABLE wishlist_items (
+  id VARCHAR(20) PRIMARY KEY,
+  wishlist_id VARCHAR(20) NOT NULL,
+  product_id VARCHAR(20) NOT NULL,
+  added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (wishlist_id) REFERENCES wishlists(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id),
+  INDEX idx_wishlist_id (wishlist_id),
+  INDEX idx_product_id (product_id),
+  UNIQUE KEY unique_wishlist_product (wishlist_id, product_id)
+);
+```
+
+#### Reviews Table
+
+```sql
+CREATE TABLE reviews (
+  id VARCHAR(20) PRIMARY KEY,
+  product_id VARCHAR(20) NOT NULL,
+  user_id VARCHAR(20) NOT NULL,
+  rating TINYINT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  title VARCHAR(255),
+  comment TEXT,
+  verified BOOLEAN DEFAULT FALSE,
+  helpful INT DEFAULT 0,
+  not_helpful INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  INDEX idx_product_id (product_id),
+  INDEX idx_user_id (user_id),
+  INDEX idx_rating (rating),
+  UNIQUE KEY unique_user_product_review (user_id, product_id)
+);
+```
+
+#### Addresses Table
+
+```sql
+CREATE TABLE addresses (
+  id VARCHAR(20) PRIMARY KEY,
+  user_id VARCHAR(20) NOT NULL,
+  type ENUM('home', 'work', 'other') DEFAULT 'home',
+  first_name VARCHAR(50) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
+  email VARCHAR(100),
+  phone VARCHAR(20),
+  address_line1 VARCHAR(255) NOT NULL,
+  address_line2 VARCHAR(255),
+  city VARCHAR(100) NOT NULL,
+  state VARCHAR(100) NOT NULL,
+  postal_code VARCHAR(20) NOT NULL,
+  country VARCHAR(100) DEFAULT 'India',
+  is_default BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user_id (user_id),
+  INDEX idx_is_default (is_default)
+);
+```
+
+#### Coupons Table
+
+```sql
+CREATE TABLE coupons (
+  id VARCHAR(20) PRIMARY KEY,
+  code VARCHAR(50) UNIQUE NOT NULL,
+  type ENUM('percentage', 'fixed') NOT NULL,
+  value DECIMAL(10,2) NOT NULL,
+  description TEXT,
+  min_order_amount DECIMAL(10,2) DEFAULT 0,
+  max_discount_amount DECIMAL(10,2),
+  usage_limit INT DEFAULT 1,
+  used_count INT DEFAULT 0,
+  valid_from TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  valid_until TIMESTAMP NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_code (code),
+  INDEX idx_is_active (is_active),
+  INDEX idx_valid_dates (valid_from, valid_until)
+);
+```
+
+#### Contact Submissions Table
+
+```sql
+CREATE TABLE contact_submissions (
+  id VARCHAR(20) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  phone VARCHAR(20),
+  subject VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  type ENUM('general', 'support', 'sales', 'feedback') DEFAULT 'general',
+  status ENUM('pending', 'in_progress', 'resolved', 'closed') DEFAULT 'pending',
+  submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  resolved_at TIMESTAMP NULL,
+  INDEX idx_email (email),
+  INDEX idx_type (type),
+  INDEX idx_status (status),
+  INDEX idx_submitted_at (submitted_at)
+);
+```
+
 ---
 
 ## Implementation Priority
@@ -1722,6 +2742,10 @@ CREATE TABLE cart_items (
 
 - ✅ Get Homepage Content (`GET /content/homepage`)
 
+#### Contact Form
+
+- ✅ Submit Contact Form (`POST /contact/submit`)
+
 ### Phase 2: Enhanced Features (Medium Priority)
 
 **Timeline: 6-8 weeks**
@@ -1734,11 +2758,29 @@ CREATE TABLE cart_items (
 - 🔄 Update User Profile (`PUT /users/profile`)
 - 🔄 Get User Orders (`GET /users/orders`)
 
-#### Product Features
+#### Wishlist Management
+
+- 🔄 Get User Wishlist (`GET /users/wishlist`)
+- 🔄 Add Item to Wishlist (`POST /users/wishlist/items`)
+- 🔄 Remove Item from Wishlist (`DELETE /users/wishlist/items/{productId}`)
+
+#### Product Reviews & Ratings
 
 - 🔄 Get Product Reviews (`GET /products/{productId}/reviews`)
 - 🔄 Add Product Review (`POST /products/{productId}/reviews`)
-- 🔄 Update Product Stock (`PUT /products/{productId}/stock`)
+
+#### Address Management
+
+- 🔄 Get User Addresses (`GET /users/addresses`)
+- 🔄 Add User Address (`POST /users/addresses`)
+- 🔄 Update User Address (`PUT /users/addresses/{addressId}`)
+- 🔄 Delete User Address (`DELETE /users/addresses/{addressId}`)
+
+#### Coupon Management
+
+- 🔄 Validate Coupon (`GET /coupons/validate/{code}`)
+- 🔄 Apply Coupon to Cart (`POST /cart/apply-coupon`)
+- 🔄 Remove Coupon from Cart (`DELETE /cart/remove-coupon`)
 
 #### Search & Analytics
 
@@ -1761,12 +2803,27 @@ CREATE TABLE cart_items (
 - ⏳ Track Page View (`POST /analytics/pageview`)
 - ⏳ Upload User Avatar (`POST /upload/avatar`)
 
+#### Advanced Wishlist & Reviews
+
+- ⏳ Check if Product is in Wishlist (`GET /users/wishlist/check/{productId}`)
+- ⏳ Update Product Review (`PUT /reviews/{reviewId}`)
+- ⏳ Delete Product Review (`DELETE /reviews/{reviewId}`)
+- ⏳ Mark Review as Helpful (`POST /reviews/{reviewId}/helpful`)
+
+#### Advanced Address & Coupon Features
+
+- ⏳ Set Default Address (`PUT /users/addresses/{addressId}/default`)
+- ⏳ Get Available Coupons (`GET /coupons/available`)
+
+#### Admin Features
+
+- ⏳ Get Contact Submissions (`GET /contact/submissions`) - Admin only
+
 #### Additional Features
 
 - ⏳ Token Refresh (`POST /auth/refresh`) - Optional since tokens don't expire
 - ⏳ Logout (`POST /auth/logout`)
 - ⏳ Clear Cart (`DELETE /cart`)
-- ⏳ Apply Coupon (`POST /cart/coupon`)
 
 ---
 
@@ -1881,9 +2938,33 @@ await fetch("/api/v1/cart/sync", {
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: January 15, 2024
-**Total Endpoints**: 45+
-**Estimated Development Time**: 8-10 weeks
+**Document Version**: 2.0
+**Last Updated**: January 19, 2025
+**Total Endpoints**: 65+
+**Estimated Development Time**: 10-12 weeks
 
-This comprehensive API documentation provides all the necessary endpoints to replace the current static/mock data implementations in the RG Publication website. The APIs are designed to support the Featured Collections system, cart functionality, search capabilities, and all existing website features while providing a scalable foundation for future enhancements.
+This comprehensive API documentation provides all the necessary endpoints to replace the current static/mock data implementations in the RG Publication website. The APIs are designed to support the Featured Collections system, cart functionality, search capabilities, wishlist management, product reviews, address management, coupon system, contact forms, and all existing website features while providing a scalable foundation for future enhancements.
+
+## New Features Added in Version 2.0:
+
+### ✅ **Essential Missing APIs Implemented:**
+
+1. **Wishlist Management** - Complete CRUD operations for user wishlists
+2. **Product Reviews & Ratings** - Full review system with helpful/not helpful feedback
+3. **Address Management** - User address CRUD operations with default address support
+4. **Coupon Management** - Coupon validation, application, and removal from cart
+5. **Contact Form** - Contact form submission with admin management capabilities
+
+### 📊 **Enhanced Database Schema:**
+
+- Added 6 new database tables: wishlists, wishlist_items, reviews, addresses, coupons, contact_submissions
+- Proper foreign key relationships and indexing for optimal performance
+- Support for complex business logic like coupon validation and review aggregation
+
+### 🎯 **Updated Implementation Priority:**
+
+- **Phase 1 (MVP)**: Core features + Contact Form (4-6 weeks)
+- **Phase 2 (Enhanced)**: Wishlist, Reviews, Addresses, Coupons (6-8 weeks)
+- **Phase 3 (Advanced)**: Advanced features and admin capabilities (8-10 weeks)
+
+This updated documentation now covers 100% of the RG Publication website requirements and provides a complete backend API specification ready for implementation.
