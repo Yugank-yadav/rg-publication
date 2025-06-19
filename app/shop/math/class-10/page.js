@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const metadata = {
   title: "Class 10 Mathematics Books | RG Publication",
   description:
@@ -64,9 +66,9 @@ export default function MathClass10Page() {
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li className="inline-flex items-center">
-              <a href="/shop" className="text-gray-700 hover:text-gray-900">
+              <Link href="/shop" className="text-gray-700 hover:text-gray-900">
                 Shop
-              </a>
+              </Link>
             </li>
             <li>
               <div className="flex items-center">
@@ -163,13 +165,13 @@ export default function MathClass10Page() {
           </h3>
           <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
             {[5, 6, 7, 8, 9, 11, 12].map((classNum) => (
-              <a
+              <Link
                 key={classNum}
                 href={`/shop/math/class-${classNum}`}
                 className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-3 rounded-lg text-center font-medium transition-colors"
               >
                 Class {classNum}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
