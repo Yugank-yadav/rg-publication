@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useCart } from "../../contexts/CartContext";
+import logger from "../../lib/logger";
 import {
-  ShoppingBagIcon,
   TrashIcon,
   PlusIcon,
   MinusIcon,
@@ -17,70 +17,101 @@ import {
 } from "@heroicons/react/24/outline";
 import { ShoppingBagIcon as ShoppingBagIconSolid } from "@heroicons/react/24/solid";
 
-// Mock cart data - this would come from a global state management system
-const mockCartItems = [
-  {
-    id: 1,
-    title: "Complete Mathematics for Class 10",
-    price: 250,
-    quantity: 2,
-    image: "📐",
-    subject: "Mathematics",
-    class: 10,
-    author: "Dr. R.K. Sharma",
-    isbn: "978-81-234-5678-9",
-  },
-  {
-    id: 15,
-    title: "Advanced Physics for Class 12",
-    price: 300,
-    quantity: 1,
-    image: "⚛️",
-    subject: "Science",
-    class: 12,
-    author: "Prof. A.K. Singh",
-    isbn: "978-81-234-5679-6",
-  },
-  {
-    id: 8,
-    title: "Chemistry Practical Manual",
-    price: 180,
-    quantity: 1,
-    image: "🧪",
-    subject: "Science",
-    class: 11,
-    author: "Dr. M.L. Gupta",
-    isbn: "978-81-234-5680-2",
-  },
-];
+// No static data - all cart items come from CartContext API integration
 
-// Loading component
+// Loading component following profile page skeleton pattern
 function CartLoading() {
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
+      {/* Breadcrumb skeleton */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center space-x-2">
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-12"></div>
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-1"></div>
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Cart items skeleton */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="h-8 bg-gray-200 rounded animate-pulse mb-6 w-48"></div>
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-24 bg-gray-200 rounded animate-pulse"
-                  ></div>
-                ))}
-              </div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="h-8 bg-gray-200 rounded animate-pulse w-48"></div>
+              <div className="h-6 bg-gray-200 rounded animate-pulse w-16"></div>
+            </div>
+
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white border border-gray-200 rounded-lg p-6"
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className="w-20 h-24 bg-gray-200 rounded-lg animate-pulse"></div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="h-5 bg-gray-200 rounded animate-pulse mb-2"></div>
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-32 mb-2"></div>
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className="h-6 bg-gray-200 rounded-full animate-pulse w-20"></div>
+                            <div className="h-6 bg-gray-200 rounded-full animate-pulse w-16"></div>
+                          </div>
+                        </div>
+                        <div className="h-10 bg-gray-200 rounded animate-pulse w-10"></div>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+                          <div className="h-8 bg-gray-200 rounded animate-pulse w-24"></div>
+                        </div>
+                        <div className="text-right">
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-16 mb-1"></div>
+                          <div className="h-5 bg-gray-200 rounded animate-pulse w-20"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8">
+              <div className="h-6 bg-gray-200 rounded animate-pulse w-32"></div>
             </div>
           </div>
+
+          {/* Order summary skeleton */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="h-6 bg-gray-200 rounded animate-pulse mb-4 w-32"></div>
-              <div className="space-y-3">
+              <div className="h-6 bg-gray-200 rounded animate-pulse mb-6 w-32"></div>
+
+              <div className="space-y-4 mb-6">
                 {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex justify-between">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-12"></div>
+                  </div>
+                ))}
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="flex justify-between">
+                    <div className="h-5 bg-gray-200 rounded animate-pulse w-16"></div>
+                    <div className="h-5 bg-gray-200 rounded animate-pulse w-16"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-12 bg-gray-200 rounded animate-pulse mb-6"></div>
+
+              <div className="space-y-3">
+                {[...Array(2)].map((_, i) => (
                   <div
                     key={i}
-                    className="h-4 bg-gray-200 rounded animate-pulse"
+                    className="h-4 bg-gray-200 rounded animate-pulse w-24"
                   ></div>
                 ))}
               </div>
@@ -104,14 +135,24 @@ function CartItem({ item, onUpdateQuantity, onRemove }) {
     >
       <div className="flex items-start space-x-4">
         {/* Book Cover */}
-        <div
-          className={`w-20 h-24 flex items-center justify-center text-3xl rounded-lg ${
-            item.subject === "Mathematics"
-              ? "bg-gradient-to-br from-blue-100 to-blue-200"
-              : "bg-gradient-to-br from-green-100 to-green-200"
-          }`}
-        >
-          {item.image}
+        <div className="w-20 h-24 rounded-lg overflow-hidden">
+          {item.coverImage || item.image ? (
+            <img
+              src={item.coverImage || item.image}
+              alt={item.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div
+              className={`w-full h-full flex items-center justify-center text-3xl ${
+                item.subject === "Mathematics"
+                  ? "bg-gradient-to-br from-blue-100 to-blue-200"
+                  : "bg-gradient-to-br from-green-100 to-green-200"
+              }`}
+            >
+              {item.subject === "Mathematics" ? "📐" : "🔬"}
+            </div>
+          )}
         </div>
 
         {/* Book Details */}
@@ -170,7 +211,7 @@ function CartItem({ item, onUpdateQuantity, onRemove }) {
                   <MinusIcon className="h-4 w-4" />
                 </motion.button>
                 <span className="w-12 text-center font-medium">
-                  {item.quantity}
+                  {parseInt(item.quantity) || 1}
                 </span>
                 <motion.button
                   onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
@@ -184,9 +225,14 @@ function CartItem({ item, onUpdateQuantity, onRemove }) {
             </div>
 
             <div className="text-right">
-              <p className="text-sm text-gray-600">₹{item.price} each</p>
+              <p className="text-sm text-gray-600">
+                ₹{parseFloat(item.price) || 0} each
+              </p>
               <p className="text-lg font-bold text-gray-900">
-                ₹{item.price * item.quantity}
+                ₹
+                {Math.round(
+                  (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1)
+                )}
               </p>
             </div>
           </div>
@@ -198,10 +244,13 @@ function CartItem({ item, onUpdateQuantity, onRemove }) {
 
 // Order summary component
 function OrderSummary({ items, onCheckout }) {
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  // Ensure all calculations use valid numbers
+  const subtotal = items.reduce((sum, item) => {
+    const price = parseFloat(item.price) || 0;
+    const quantity = parseInt(item.quantity) || 0;
+    return sum + price * quantity;
+  }, 0);
+
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = Math.round(subtotal * 0.18); // 18% GST
   const total = subtotal + shipping + tax;
@@ -275,13 +324,16 @@ function OrderSummary({ items, onCheckout }) {
 
 // Main cart component
 export default function CartPage() {
-  const {
-    cartItems,
+  logger.debug("CartPage component rendering...");
+
+  const { cartItems, isLoading, updateQuantity, removeFromCart } = useCart();
+
+  // Debug cart state
+  logger.debug("Cart Page Render:", {
+    cartItemsLength: cartItems?.length,
     isLoading,
-    updateQuantity,
-    removeFromCart,
-    getCartTotals,
-  } = useCart();
+    cartItems: cartItems,
+  });
 
   const handleCheckout = () => {
     // In a real app, this would navigate to checkout page
@@ -290,8 +342,23 @@ export default function CartPage() {
     );
   };
 
+  // Add a small delay to ensure cart context has time to load
   if (isLoading) {
+    logger.debug("Cart page showing loading state");
     return <CartLoading />;
+  }
+
+  // Simple display logic - use cart context items directly
+  const hasItems = cartItems.length > 0;
+
+  logger.debug("Display logic:", {
+    cartItemsLength: cartItems.length,
+    hasItems,
+  });
+
+  // Debug cart items structure
+  if (cartItems.length > 0) {
+    logger.debug("Cart items structure:", cartItems[0]);
   }
 
   return (
@@ -310,7 +377,7 @@ export default function CartPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {cartItems.length === 0 ? (
+        {!hasItems ? (
           // Empty cart state
           <motion.div
             initial={{ opacity: 0, y: 20 }}

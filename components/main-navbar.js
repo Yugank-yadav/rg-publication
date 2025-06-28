@@ -33,12 +33,17 @@ import {
   CalculatorIcon,
   BeakerIcon,
   ShoppingBagIcon,
+  HeartIcon,
 } from "@heroicons/react/16/solid";
 import {
   ShoppingCartIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useToast } from "@/contexts/ToastContext";
+import logger from "@/lib/logger";
 
 // Custom animated tab component for desktop with sliding underline and bounce
 function AnimatedTab({ children, isActive, href, className = "" }) {
@@ -342,6 +347,19 @@ export default function MainNavbar() {
   const pathname = usePathname();
   const { getCartTotals } = useCart();
   const { itemCount } = getCartTotals();
+  const { user, isAuthenticated, logout } = useAuth();
+  const { getWishlistCount } = useWishlist();
+  const { showSuccess } = useToast();
+  const wishlistCount = getWishlistCount();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      showSuccess("Successfully logged out. See you soon!");
+    } catch (error) {
+      logger.error("Logout error:", error);
+    }
+  };
 
   // Navigation items with proper routes
   const navItems = [
@@ -474,6 +492,21 @@ export default function MainNavbar() {
             <MagnifyingGlassIcon className="h-5 w-5" />
           </Link>
         </NavbarItem>
+
+        {/* Wishlist - only show if authenticated */}
+        {isAuthenticated && (
+          <NavbarItem aria-label="Wishlist">
+            <Link href="/wishlist" className="relative">
+              <HeartIcon className="h-5 w-5" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              )}
+            </Link>
+          </NavbarItem>
+        )}
+
         <NavbarItem aria-label="Shopping Cart">
           <Link href="/cart" className="relative">
             <ShoppingCartIcon className="h-5 w-5" />
@@ -486,37 +519,89 @@ export default function MainNavbar() {
         </NavbarItem>
 
         {/* User dropdown */}
-        <Dropdown>
-          <DropdownButton as={NavbarItem}>
-            <Avatar src="/profile.svg" square size="sm" />
-          </DropdownButton>
-          <DropdownMenu className="min-w-64" anchor="bottom end">
-            <DropdownItem>
-              <Link href="/profile" className="flex items-center gap-2 w-full">
-                <UserIcon className="h-4 w-4 text-gray-500" />
-                <DropdownLabel>My profile</DropdownLabel>
-              </Link>
-            </DropdownItem>
-            <DropdownItem>
-              <Cog8ToothIcon className="h-4 w-4 text-gray-500" />
-              <DropdownLabel>Settings</DropdownLabel>
-            </DropdownItem>
-            <DropdownDivider />
-            <DropdownItem>
-              <ShieldCheckIcon className="h-4 w-4 text-gray-500" />
-              <DropdownLabel>Privacy policy</DropdownLabel>
-            </DropdownItem>
-            <DropdownItem>
-              <LightBulbIcon className="h-4 w-4 text-gray-500" />
-              <DropdownLabel>Share feedback</DropdownLabel>
-            </DropdownItem>
-            <DropdownDivider />
-            <DropdownItem>
-              <ArrowRightStartOnRectangleIcon className="h-4 w-4 text-gray-500" />
-              <DropdownLabel>Sign out</DropdownLabel>
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
+        {isAuthenticated ? (
+          <Dropdown>
+            <DropdownButton as={NavbarItem}>
+              <Avatar
+                initials={
+                  user
+                    ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`
+                    : "U"
+                }
+                className="text-white"
+                style={{ backgroundColor: "#a8f1ff" }}
+                size="sm"
+              />
+            </DropdownButton>
+            <DropdownMenu className="min-w-64" anchor="bottom end">
+              <div className="px-3 py-2 border-b border-gray-200">
+                <p className="text-sm font-medium text-gray-900">
+                  {user ? `${user.firstName} ${user.lastName}` : "User"}
+                </p>
+                <p className="text-xs text-gray-500">{user?.email}</p>
+              </div>
+              <DropdownItem>
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 w-full"
+                >
+                  <UserIcon className="h-4 w-4 text-gray-500" />
+                  <DropdownLabel>My Profile</DropdownLabel>
+                </Link>
+              </DropdownItem>
+              <DropdownItem>
+                <Link
+                  href="/profile?tab=orders"
+                  className="flex items-center gap-2 w-full"
+                >
+                  <ShoppingBagIcon className="h-4 w-4 text-gray-500" />
+                  <DropdownLabel>My Orders</DropdownLabel>
+                </Link>
+              </DropdownItem>
+              <DropdownItem>
+                <Link
+                  href="/profile?tab=wishlist"
+                  className="flex items-center gap-2 w-full"
+                >
+                  <HeartIcon className="h-4 w-4 text-gray-500" />
+                  <DropdownLabel>My Wishlist</DropdownLabel>
+                </Link>
+              </DropdownItem>
+              <DropdownItem>
+                <Link
+                  href="/profile?tab=addresses"
+                  className="flex items-center gap-2 w-full"
+                >
+                  <Cog8ToothIcon className="h-4 w-4 text-gray-500" />
+                  <DropdownLabel>Addresses</DropdownLabel>
+                </Link>
+              </DropdownItem>
+              <DropdownDivider />
+              <DropdownItem>
+                <ShieldCheckIcon className="h-4 w-4 text-gray-500" />
+                <DropdownLabel>Privacy Policy</DropdownLabel>
+              </DropdownItem>
+              <DropdownItem>
+                <LightBulbIcon className="h-4 w-4 text-gray-500" />
+                <DropdownLabel>Share Feedback</DropdownLabel>
+              </DropdownItem>
+              <DropdownDivider />
+              <DropdownItem onClick={handleLogout}>
+                <ArrowRightStartOnRectangleIcon className="h-4 w-4 text-gray-500" />
+                <DropdownLabel>Sign Out</DropdownLabel>
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        ) : (
+          <NavbarItem>
+            <Link
+              href="/auth/login"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+            >
+              Sign In
+            </Link>
+          </NavbarItem>
+        )}
       </NavbarSection>
     </Navbar>
   );

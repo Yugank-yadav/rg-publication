@@ -8,6 +8,8 @@ import {
   MapPinIcon,
   ArrowRightIcon,
 } from "@heroicons/react/24/outline";
+import logger from "@/lib/logger";
+
 // Social media icons will be created as simple SVGs
 
 export default function Footer() {
@@ -16,7 +18,7 @@ export default function Footer() {
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
     // Handle newsletter subscription
-    console.log("Newsletter subscription:", email);
+    logger.debug("Newsletter subscription:", email);
     setEmail("");
   };
 

@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local development files
+debug-auth-test.html
+test-api.js
+*.md.backup
+
+# Backend specific (if included)
+backend/node_modules/
+backend/.env
+backend/logs/
+backend/uploads/

@@ -1,72 +1,200 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { productAPI } from "@/lib/api";
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useToast } from "@/contexts/ToastContext";
+import logger from "@/lib/logger";
 import {
   ArrowRightIcon,
   StarIcon,
   HeartIcon,
   FireIcon,
 } from "@heroicons/react/24/outline";
-import { StarIcon as StarSolidIcon } from "@heroicons/react/24/solid";
+import {
+  StarIcon as StarSolidIcon,
+  HeartIcon as HeartIconSolid,
+} from "@heroicons/react/24/solid";
+
+// Loading component following profile page skeleton pattern
+function TrendingProductsLoading() {
+  return (
+    <section className="relative py-20 bg-gradient-to-br from-orange-50/30 via-white to-red-50/20 overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 right-10 w-32 h-32 rounded-full opacity-10 bg-gray-200 animate-pulse" />
+        <div className="absolute bottom-20 left-10 w-24 h-24 rounded-full opacity-10 bg-gray-200 animate-pulse" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section Header Skeleton */}
+        <div className="text-center mb-16">
+          <div className="h-8 bg-gray-200 rounded-full animate-pulse mb-6 mx-auto w-32"></div>
+          <div className="h-12 bg-gray-200 rounded animate-pulse mb-6 mx-auto max-w-md"></div>
+          <div className="h-6 bg-gray-200 rounded animate-pulse mx-auto max-w-3xl"></div>
+        </div>
+
+        {/* Books Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div className="h-64 bg-gray-200 animate-pulse"></div>
+              <div className="p-6">
+                <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse mb-3 w-3/4"></div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="h-6 bg-gray-200 rounded animate-pulse w-16"></div>
+                  <div className="h-10 bg-gray-200 rounded animate-pulse w-24"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Call to Action Skeleton */}
+        <div className="text-center">
+          <div className="h-12 bg-gray-200 rounded-xl animate-pulse mx-auto w-48"></div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function TrendingProducts() {
-  // Static data for trending books
-  const trendingBooks = [
-    {
-      id: 1,
-      title: "Advanced Physics Concepts",
-      author: "Dr. Sarah Chen",
-      description:
-        "Explore cutting-edge physics theories and their real-world applications in this comprehensive guide.",
-      price: "$18.99",
-      rating: 4.9,
-      reviews: 8547,
-      coverImage:
-        "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=300&h=400&fit=crop&auto=format",
-      category: "Physics",
-    },
-    {
-      id: 2,
-      title: "Digital Marketing Mastery",
-      author: "Alex Rodriguez",
-      description:
-        "Master the art of digital marketing with proven strategies and modern techniques for success.",
-      price: "$22.99",
-      rating: 4.8,
-      reviews: 12394,
-      coverImage:
-        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&h=400&fit=crop&auto=format",
-      category: "Business",
-    },
-    {
-      id: 3,
-      title: "Creative Writing Workshop",
-      author: "Emma Thompson",
-      description:
-        "Unlock your creative potential with exercises and techniques from award-winning authors.",
-      price: "$16.99",
-      rating: 4.7,
-      reviews: 9876,
-      coverImage:
-        "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop&auto=format",
-      category: "Writing",
-    },
-    {
-      id: 4,
-      title: "Modern Web Development",
-      author: "Jake Wilson",
-      description:
-        "Build modern web applications with the latest technologies and best practices in development.",
-      price: "$24.99",
-      rating: 4.9,
-      reviews: 15432,
-      coverImage:
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=300&h=400&fit=crop&auto=format",
-      category: "Technology",
-    },
-  ];
+  const [isLoading, setIsLoading] = useState(true);
+  const [books, setBooks] = useState([]);
+  const [error, setError] = useState(null);
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { showSuccess, showError, showWarning } = useToast();
+  // No static data - all content should come from API
+
+  // Load trending books from API
+  useEffect(() => {
+    const loadTrendingBooks = async () => {
+      try {
+        setIsLoading(true);
+
+        const response = await productAPI.getFeaturedProducts("trending");
+
+        if (response.success) {
+          // Transform API data to match component expectations
+          const transformedBooks = response.data.trending.map((product) => ({
+            id: product.id,
+            title: product.title,
+            author: product.author,
+            description: product.description,
+            price: `₹${product.price}`,
+            originalPrice: product.originalPrice
+              ? `₹${product.originalPrice}`
+              : null,
+            rating: product.rating?.average || 0,
+            reviews: product.rating?.count || 0,
+            coverImage:
+              product.images?.[0]?.url ||
+              "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop&auto=format",
+            category: product.subject,
+            class: product.class,
+            inStock: product.inStock,
+          }));
+
+          setBooks(transformedBooks);
+        } else {
+          // No fallback to static data - show empty state
+          setBooks([]);
+        }
+      } catch (err) {
+        logger.error("Error loading trending books:", err);
+        // No fallback to static data - show empty state
+        setBooks([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTrendingBooks();
+  }, []);
+
+  // Show loading state
+  if (isLoading) {
+    return <TrendingProductsLoading />;
+  }
+
+  // Show empty state if no books
+  if (books.length === 0) {
+    return (
+      <section className="relative py-20 bg-gradient-to-br from-orange-50/30 via-white to-red-50/20 overflow-hidden">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+              style={{ backgroundColor: "#a8f1ff20" }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <FireIcon className="h-5 w-5 text-orange-500" />
+              <span className="text-sm font-semibold text-gray-700">
+                Trending Now
+              </span>
+            </motion.div>
+
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Trending{" "}
+              <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                Products
+              </span>
+            </h2>
+          </motion.div>
+
+          <motion.div
+            className="text-center py-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <FireIcon className="h-24 w-24 text-gray-300 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              No Trending Products Available
+            </h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              We&apos;re currently updating our trending list. Please check back
+              soon or browse our full catalog.
+            </p>
+            <Link href="/shop">
+              <motion.button
+                className="inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
+                style={{ backgroundColor: "#a8f1ff", color: "#1f2937" }}
+                whileHover={{
+                  scale: 1.05,
+                  y: -2,
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Browse All Books
+                <ArrowRightIcon className="h-5 w-5" />
+              </motion.button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -201,7 +329,7 @@ export default function TrendingProducts() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {trendingBooks.map((book) => (
+          {books.map((book) => (
             <motion.div
               key={book.id}
               variants={bookVariants}
@@ -259,17 +387,47 @@ export default function TrendingProducts() {
 
                     {/* Favorite Icon */}
                     <motion.button
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        // Wishlist logic here
-                        console.log(`Added ${book.title} to wishlist`);
+
+                        try {
+                          if (isInWishlist(book.id)) {
+                            const result = await removeFromWishlist(book.id);
+                            if (result.success) {
+                              showSuccess("Removed from wishlist");
+                            } else {
+                              showError(
+                                result.error || "Failed to remove from wishlist"
+                              );
+                            }
+                          } else {
+                            const result = await addToWishlist(book);
+                            if (result.success) {
+                              showSuccess("Added to wishlist");
+                            } else {
+                              showError(
+                                result.error || "Failed to add to wishlist"
+                              );
+                            }
+                          }
+                        } catch (error) {
+                          logger.error("Wishlist error:", error);
+                          showError(
+                            error.message ||
+                              "Please log in to manage your wishlist"
+                          );
+                        }
                       }}
                       className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
-                      <HeartIcon className="h-5 w-5 text-white" />
+                      {isInWishlist(book.id) ? (
+                        <HeartIconSolid className="h-5 w-5 text-red-500" />
+                      ) : (
+                        <HeartIcon className="h-5 w-5 text-white" />
+                      )}
                     </motion.button>
 
                     {/* Category Badge */}
@@ -308,21 +466,49 @@ export default function TrendingProducts() {
                         {book.price}
                       </span>
                       <motion.button
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          // Add to cart logic here
-                          console.log(`Added ${book.title} to cart`);
+
+                          try {
+                            await addToCart(book, 1);
+                          } catch (error) {
+                            logger.error("Add to cart error:", error);
+
+                            // Handle different error types with appropriate messages
+                            if (error.code === "AUTHENTICATION_REQUIRED") {
+                              showWarning(
+                                "Please log in to add items to your cart"
+                              );
+                            } else if (error.code === "INSUFFICIENT_STOCK") {
+                              showError("Sorry, this item is out of stock");
+                            } else {
+                              showError(
+                                error.message || "Failed to add item to cart"
+                              );
+                            }
+                          }
                         }}
-                        className="px-4 py-2 text-sm font-semibold rounded-lg text-gray-800 transition-all duration-300"
-                        style={{ backgroundColor: "#a8f1ff" }}
-                        whileHover={{
-                          scale: 1.05,
-                          backgroundColor: "#8ee8f7",
+                        disabled={!book.inStock}
+                        className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
+                          book.inStock
+                            ? "text-gray-800"
+                            : "text-gray-500 cursor-not-allowed opacity-50"
+                        }`}
+                        style={{
+                          backgroundColor: book.inStock ? "#a8f1ff" : "#f3f4f6",
                         }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={
+                          book.inStock
+                            ? {
+                                scale: 1.05,
+                                backgroundColor: "#8ee8f7",
+                              }
+                            : {}
+                        }
+                        whileTap={book.inStock ? { scale: 0.95 } : {}}
                       >
-                        Add to Cart
+                        {book.inStock ? "Add to Cart" : "Out of Stock"}
                       </motion.button>
                     </div>
                   </div>

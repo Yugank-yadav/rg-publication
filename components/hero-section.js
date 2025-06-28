@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import logger from "@/lib/logger";
 import {
   ArrowRightIcon,
   BookOpenIcon,
@@ -11,35 +12,64 @@ import {
 
 export default function HeroSection() {
   const [isClient, setIsClient] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const containerRef = useRef(null);
+  const bookRef = useRef(null);
+  const lastUpdateTime = useRef(0);
 
-  // Simple state-based approach for testing
-  const rotateX = (mousePos.y - 0.5) * -80; // -40 to 40 degrees
-  const rotateY = (mousePos.x - 0.5) * 100; // -50 to 50 degrees
-  const bookX = (mousePos.x - 0.5) * 50; // -25 to 25 pixels
-  const bookY = (mousePos.y - 0.5) * 60; // -30 to 30 pixels
+  // Remove state-based mouse tracking to prevent infinite re-renders
+  // Use direct DOM manipulation instead
 
   const handleMouseMove = useCallback((e) => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !bookRef.current) return;
+
+    const now = Date.now();
+    // Throttle to 30fps for smooth performance
+    if (now - lastUpdateTime.current < 33) {
+      return;
+    }
+    lastUpdateTime.current = now;
 
     try {
       const rect = containerRef.current.getBoundingClientRect();
-      // Normalize coordinates to 0-1 range
+      if (!rect) return;
+
+      // Calculate normalized coordinates
       const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
 
-      setMousePos({ x, y });
+      // Calculate transforms
+      const rotateX = (y - 0.5) * -80; // -40 to 40 degrees
+      const rotateY = (x - 0.5) * 100; // -50 to 50 degrees
+      const translateX = (x - 0.5) * 50; // -25 to 25 pixels
+      const translateY = (y - 0.5) * 60; // -30 to 30 pixels
+
+      // Apply transforms directly to DOM element (no state updates!)
+      bookRef.current.style.transform = `
+        perspective(1000px)
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg)
+        translateX(${translateX}px)
+        translateY(${translateY}px)
+      `;
     } catch (error) {
-      console.warn("Mouse tracking error:", error);
-      // Fallback to center position
-      setMousePos({ x: 0.5, y: 0.5 });
+      logger.warn("Mouse tracking error:", error);
     }
   }, []);
 
   const handleMouseLeave = useCallback(() => {
-    // Smoothly return to center position when mouse leaves
-    setMousePos({ x: 0.5, y: 0.5 });
+    // Reset throttle timer and return to center position
+    lastUpdateTime.current = 0;
+
+    if (bookRef.current) {
+      // Reset to center position using direct DOM manipulation
+      bookRef.current.style.transform = `
+        perspective(1000px)
+        rotateX(0deg)
+        rotateY(0deg)
+        translateX(0px)
+        translateY(0px)
+      `;
+    }
   }, []);
 
   useEffect(() => {
@@ -64,6 +94,8 @@ export default function HeroSection() {
         currentContainer.removeEventListener("mousemove", handleMouseMove);
         currentContainer.removeEventListener("mouseleave", handleMouseLeave);
       }
+      // Reset throttle timer on cleanup
+      lastUpdateTime.current = 0;
     };
   }, [handleMouseMove, handleMouseLeave]);
 
@@ -204,53 +236,23 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             {/* Enhanced 3D Book Container */}
-            <motion.div
+            <div
               className="relative w-80 h-96"
               style={{
                 perspective: "1200px",
-                x: bookX,
-                y: bookY,
-              }}
-              animate={{
-                rotateX: rotateX * 0.2, // Subtle container rotation
-                rotateY: rotateY * 0.2,
-              }}
-              transition={{
-                type: "spring",
-                damping: 20,
-                stiffness: 200,
               }}
             >
               {/* Enhanced Dynamic Shadow */}
-              <motion.div
-                className="absolute inset-0 bg-black/25 blur-xl transform translate-y-8 scale-110"
-                animate={{
-                  rotateX: rotateX * 0.3,
-                  rotateY: rotateY * 0.3,
-                  x: rotateY * 0.5,
-                  y: -rotateX * 0.3,
-                }}
-                transition={{
-                  type: "spring",
-                  damping: 20,
-                  stiffness: 200,
-                }}
-              />
+              <div className="absolute inset-0 bg-black/25 blur-xl transform translate-y-8 scale-110" />
 
               {/* Main Book with Enhanced Rotation */}
-              <motion.div
-                className="relative w-full h-full transform-gpu"
+              <div
+                ref={bookRef}
+                className="relative w-full h-full transform-gpu transition-transform duration-100 ease-out"
                 style={{
                   transformStyle: "preserve-3d",
-                }}
-                animate={{
-                  rotateX,
-                  rotateY,
-                }}
-                transition={{
-                  type: "spring",
-                  damping: 20,
-                  stiffness: 200,
+                  transform:
+                    "perspective(1000px) rotateX(0deg) rotateY(0deg) translateX(0px) translateY(0px)",
                 }}
               >
                 {/* Book Cover */}
@@ -289,8 +291,8 @@ export default function HeroSection() {
                     transform: "translateZ(-20px) rotateY(180deg)",
                   }}
                 />
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
 
             {/* Floating Elements */}
             <motion.div

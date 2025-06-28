@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { contactAPI } from "@/lib/api";
+import logger from "@/lib/logger";
 import {
   EnvelopeIcon,
   PhoneIcon,
@@ -18,6 +20,8 @@ export default function ContactUs() {
     subject: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,10 +31,34 @@ export default function ContactUs() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
+
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      const response = await contactAPI.submitContact(formData);
+
+      if (response.success) {
+        setSubmitStatus("success");
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        setSubmitStatus("error");
+      }
+    } catch (error) {
+      logger.error("Contact form submission error:", error);
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -273,18 +301,61 @@ export default function ContactUs() {
                   />
                 </div>
 
+                {/* Success/Error Messages */}
+                {submitStatus === "success" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-green-50 border border-green-200 rounded-lg"
+                  >
+                    <p className="text-green-700 text-sm font-medium">
+                      ✅ Thank you! Your message has been sent successfully.
+                      We&apos;ll get back to you soon.
+                    </p>
+                  </motion.div>
+                )}
+
+                {submitStatus === "error" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-red-50 border border-red-200 rounded-lg"
+                  >
+                    <p className="text-red-700 text-sm font-medium">
+                      ❌ Sorry, there was an error sending your message. Please
+                      try again.
+                    </p>
+                  </motion.div>
+                )}
+
                 <motion.button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
+                  disabled={isSubmitting}
+                  className={`w-full inline-flex items-center justify-center gap-3 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl ${
+                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                   style={{ backgroundColor: "#a8f1ff", color: "#1f2937" }}
-                  whileHover={{
-                    scale: 1.02,
-                    y: -2,
-                  }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={
+                    !isSubmitting
+                      ? {
+                          scale: 1.02,
+                          y: -2,
+                        }
+                      : {}
+                  }
+                  whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                 >
-                  Send Message
-                  <PaperAirplaneIcon className="h-5 w-5" />
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-700"></div>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Send Message
+                      <PaperAirplaneIcon className="h-5 w-5" />
+                    </>
+                  )}
                 </motion.button>
               </form>
             </div>

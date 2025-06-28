@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { productAPI } from "@/lib/api";
+import logger from "@/lib/logger";
 import {
   MagnifyingGlassIcon,
   XMarkIcon,
@@ -14,144 +16,61 @@ import {
 } from "@heroicons/react/24/outline";
 import { MagnifyingGlassIcon as MagnifyingGlassIconSolid } from "@heroicons/react/24/solid";
 
-// Mock product data - this would come from your product database
-const allProducts = [
-  {
-    id: 1,
-    title: "Complete Mathematics for Class 10",
-    price: 250,
-    image: "📐",
-    subject: "Mathematics",
-    class: 10,
-    author: "Dr. R.K. Sharma",
-    description:
-      "Comprehensive mathematics textbook covering all CBSE syllabus topics",
-    tags: ["algebra", "geometry", "trigonometry", "statistics"],
-  },
-  {
-    id: 2,
-    title: "Advanced Physics for Class 12",
-    price: 300,
-    image: "⚛️",
-    subject: "Science",
-    class: 12,
-    author: "Prof. A.K. Singh",
-    description: "Advanced physics concepts with practical applications",
-    tags: ["mechanics", "thermodynamics", "optics", "modern physics"],
-  },
-  {
-    id: 3,
-    title: "Chemistry Practical Manual",
-    price: 180,
-    image: "🧪",
-    subject: "Science",
-    class: 11,
-    author: "Dr. M.L. Gupta",
-    description: "Hands-on chemistry experiments and practical guide",
-    tags: ["organic", "inorganic", "physical chemistry", "experiments"],
-  },
-  {
-    id: 4,
-    title: "English Grammar & Composition",
-    price: 220,
-    image: "📚",
-    subject: "English",
-    class: 9,
-    author: "Mrs. S. Sharma",
-    description: "Complete English grammar with composition writing techniques",
-    tags: ["grammar", "composition", "writing", "literature"],
-  },
-  {
-    id: 5,
-    title: "Biology for Class 11",
-    price: 280,
-    image: "🔬",
-    subject: "Science",
-    class: 11,
-    author: "Dr. P.K. Jain",
-    description:
-      "Comprehensive biology textbook with diagrams and illustrations",
-    tags: ["botany", "zoology", "genetics", "ecology"],
-  },
-  {
-    id: 6,
-    title: "History of Modern India",
-    price: 200,
-    image: "🏛️",
-    subject: "Social Science",
-    class: 10,
-    author: "Prof. R.S. Sharma",
-    description:
-      "Detailed account of India's freedom struggle and modern history",
-    tags: ["freedom struggle", "independence", "modern india", "history"],
-  },
-];
+// No static data - all content should come from API
 
-// Recent searches mock data
-const mockRecentSearches = [
-  "Mathematics Class 10",
-  "Physics",
-  "Chemistry practical",
-  "English grammar",
-];
-
-// Popular searches
+// Popular search terms for fallback suggestions
 const popularSearches = [
-  "Class 10 books",
-  "CBSE textbooks",
-  "Science practical",
-  "Mathematics guide",
-  "English literature",
-  "History books",
+  "Mathematics Class 10",
+  "Science Class 11",
+  "English Grammar",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "Algebra",
+  "Geometry",
 ];
 
 // Search suggestions component
 function SearchSuggestions({ query, onSelectSuggestion, onClose }) {
-  const suggestions = allProducts
-    .filter(
-      (product) =>
-        product.title.toLowerCase().includes(query.toLowerCase()) ||
-        product.subject.toLowerCase().includes(query.toLowerCase()) ||
-        product.author.toLowerCase().includes(query.toLowerCase()) ||
-        product.tags.some((tag) =>
-          tag.toLowerCase().includes(query.toLowerCase())
-        )
-    )
-    .slice(0, 5);
+  const [suggestions, setSuggestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (query.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const response = await productAPI.getSearchSuggestions(query);
+        if (response.success) {
+          setSuggestions(response.data.suggestions.slice(0, 5));
+        } else {
+          // No fallback to static data - show empty suggestions
+          setSuggestions([]);
+        }
+      } catch (error) {
+        logger.error("Error fetching suggestions:", error);
+        // No fallback to static data - show empty suggestions
+        setSuggestions([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [query]);
 
   if (query.length === 0) {
     return (
       <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-50">
         <div className="p-4">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Recent Searches
-          </h4>
-          <div className="space-y-2">
-            {mockRecentSearches.map((search, index) => (
-              <button
-                key={index}
-                onClick={() => onSelectSuggestion(search)}
-                className="flex items-center space-x-2 w-full text-left p-2 hover:bg-gray-50 rounded-md"
-              >
-                <ClockIcon className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-700">{search}</span>
-              </button>
-            ))}
-          </div>
-
-          <h4 className="text-sm font-medium text-gray-900 mb-3 mt-6">
-            Popular Searches
-          </h4>
-          <div className="flex flex-wrap gap-2">
-            {popularSearches.map((search, index) => (
-              <button
-                key={index}
-                onClick={() => onSelectSuggestion(search)}
-                className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-sm text-gray-700 rounded-full transition-colors duration-200"
-              >
-                {search}
-              </button>
-            ))}
+          <div className="text-center text-gray-500">
+            <MagnifyingGlassIconSolid className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+            <p className="text-sm">Start typing to search for books...</p>
           </div>
         </div>
       </div>
@@ -260,7 +179,7 @@ function SearchResultItem({ product }) {
                   e.preventDefault();
                   e.stopPropagation();
                   // Add to cart logic
-                  console.log(`Added ${product.title} to cart`);
+                  logger.debug(`Added ${product.title} to cart`);
                 }}
               >
                 Add to Cart
@@ -295,7 +214,7 @@ export default function SearchPage() {
   }, []);
 
   useEffect(() => {
-    if (query.length > 0) {
+    if (query && query.length > 0) {
       performSearch(query);
     } else {
       setSearchResults([]);
@@ -303,38 +222,60 @@ export default function SearchPage() {
     }
   }, [query, filters]);
 
-  const performSearch = (searchQuery) => {
+  const performSearch = async (searchQuery) => {
     setIsLoading(true);
     setHasSearched(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      const results = allProducts.filter((product) => {
-        const matchesQuery =
-          product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.description
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          product.tags.some((tag) =>
-            tag.toLowerCase().includes(searchQuery.toLowerCase())
-          );
+    try {
+      // Build search parameters
+      const searchParams = {
+        q: searchQuery,
+        page: 1,
+        limit: 50,
+        sortBy: "relevance",
+        sortOrder: "desc",
+      };
 
-        const matchesSubject =
-          !filters.subject || product.subject === filters.subject;
-        const matchesClass =
-          !filters.class || product.class.toString() === filters.class;
-        const matchesPrice =
-          product.price >= filters.priceRange[0] &&
-          product.price <= filters.priceRange[1];
+      // Add filters
+      if (filters.subject) searchParams.subject = filters.subject;
+      if (filters.class) searchParams.class = filters.class;
+      if (filters.priceRange[0] > 0)
+        searchParams.priceMin = filters.priceRange[0];
+      if (filters.priceRange[1] < 500)
+        searchParams.priceMax = filters.priceRange[1];
 
-        return matchesQuery && matchesSubject && matchesClass && matchesPrice;
-      });
+      // Call search API
+      const response = await productAPI.searchProducts(searchParams);
 
-      setSearchResults(results);
+      if (response.success) {
+        // Transform API data to match component expectations
+        const transformedResults = response.data.results.map((product) => ({
+          id: product.id,
+          title: product.title,
+          subject: product.subject,
+          class: product.class,
+          type: product.type || "Textbook",
+          price: product.price,
+          image: product.subject === "Mathematics" ? "📐" : "🔬",
+          author: product.author,
+          description: product.description,
+          tags: product.tags || [],
+          featured: product.featured,
+          inStock: product.inStock,
+          coverImage: product.images?.[0]?.url,
+        }));
+
+        setSearchResults(transformedResults);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      logger.error("Search error:", error);
+      // No fallback to static data - show empty results
+      setSearchResults([]);
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   const handleSearchSubmit = (e) => {
@@ -396,8 +337,8 @@ export default function SearchPage() {
               <input
                 ref={searchInputRef}
                 type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                value={query || ""}
+                onChange={(e) => setQuery(e.target.value || "")}
                 onFocus={() => setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 placeholder="Search for books, subjects, authors..."
@@ -490,15 +431,36 @@ export default function SearchPage() {
           {/* Results */}
           <div className="lg:col-span-3">
             {isLoading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg p-6">
-                    <div className="animate-pulse flex space-x-4">
-                      <div className="w-16 h-20 bg-gray-200 rounded"></div>
-                      <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                        <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="space-y-6">
+                {/* Results header skeleton */}
+                <div className="flex items-center justify-between">
+                  <div className="h-6 bg-gray-200 rounded animate-pulse w-48"></div>
+                  <div className="h-6 bg-gray-200 rounded animate-pulse w-32"></div>
+                </div>
+
+                {/* Search result skeletons following profile page pattern */}
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white border border-gray-200 rounded-lg p-6"
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="w-16 h-20 bg-gray-200 rounded-lg animate-pulse"></div>
+                      <div className="flex-1 space-y-3">
+                        <div className="h-5 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
+
+                        <div className="flex items-center gap-2 mt-3">
+                          <div className="h-6 bg-gray-200 rounded-full animate-pulse w-20"></div>
+                          <div className="h-6 bg-gray-200 rounded-full animate-pulse w-16"></div>
+                        </div>
+
+                        <div className="flex items-center justify-between mt-4">
+                          <div className="h-6 bg-gray-200 rounded animate-pulse w-16"></div>
+                          <div className="h-10 bg-gray-200 rounded animate-pulse w-24"></div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -548,7 +510,7 @@ export default function SearchPage() {
                       <div className="flex flex-wrap justify-center gap-2 mt-2">
                         {popularSearches.slice(0, 3).map((search, index) => (
                           <button
-                            key={index}
+                            key={`popular-search-${index}-${search}`}
                             onClick={() => handleSuggestionSelect(search)}
                             className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors duration-200"
                           >

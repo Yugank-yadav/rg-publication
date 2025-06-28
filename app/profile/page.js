@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useToast } from "@/contexts/ToastContext";
+import logger from "@/lib/logger";
+import { userAPI, orderAPI } from "@/lib/api";
 import {
   UserIcon,
   EnvelopeIcon,
@@ -19,6 +25,9 @@ import {
   ClockIcon,
   TruckIcon,
   EyeIcon,
+  CalendarIcon,
+  PlusIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import {
   UserIcon as UserIconSolid,
@@ -157,15 +166,9 @@ function StatusBadge({ status }) {
 
 // Authentication check component
 function AuthCheck({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const { isAuthenticated, isLoading } = useAuth();
 
-  useEffect(() => {
-    setTimeout(() => {
-      setIsAuthenticated(true); // For demo, always authenticated
-    }, 500);
-  }, []);
-
-  if (isAuthenticated === null) {
+  if (isLoading) {
     return <ProfileLoading />;
   }
 
@@ -182,13 +185,13 @@ function AuthCheck({ children }) {
           </p>
           <div className="space-y-3">
             <Link
-              href="/auth/signin"
+              href="/auth/login"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 inline-block"
             >
               Sign In
             </Link>
             <Link
-              href="/auth/signup"
+              href="/auth/register"
               className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg font-medium transition-all duration-200 inline-block"
             >
               Create Account
@@ -203,33 +206,116 @@ function AuthCheck({ children }) {
 }
 
 // Main profile component
-export default function ProfilePage() {
+function ProfilePageContent() {
+  const searchParams = useSearchParams();
+  const { user: authUser, updateUser } = useAuth();
+  const { wishlistItems, removeFromWishlist } = useWishlist();
+  const { showSuccess, showError } = useToast();
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+  const [addresses, setAddresses] = useState([]);
   const [activeTab, setActiveTab] = useState("personal");
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({});
+  const [isAddingAddress, setIsAddingAddress] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState(null);
+  const [editForm, setEditForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+  });
+  const [addressForm, setAddressForm] = useState({
+    type: "home",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    addressLine1: "",
+    addressLine2: "",
+    landmark: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "India",
+    deliveryInstructions: "",
+    isDefault: false,
+  });
   const [error, setError] = useState(null);
+
+  // Handle URL tab parameter
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (
+      tab &&
+      ["personal", "orders", "wishlist", "addresses", "settings"].includes(tab)
+    ) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setUser(mockUser);
-        setOrders(mockOrders);
-        setWishlist(mockWishlist);
-        setEditForm(mockUser);
+        setIsLoading(true);
+        setError(null);
+
+        // Load user profile
+        const profileResponse = await userAPI.getProfile();
+        if (profileResponse.success) {
+          const userData = profileResponse.data.user;
+          setUser(userData);
+          setEditForm({
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            email: userData.email || "",
+            phone: userData.phone || "",
+            dateOfBirth: userData.dateOfBirth
+              ? userData.dateOfBirth.split("T")[0]
+              : "",
+          });
+        }
+
+        // Load order history
+        const ordersResponse = await orderAPI.getOrderHistory();
+        if (ordersResponse.success) {
+          setOrders(ordersResponse.data.orders || []);
+        }
+
+        // Load addresses
+        const addressesResponse = await userAPI.getAddresses();
+        if (addressesResponse.success) {
+          setAddresses(addressesResponse.data.addresses || []);
+        }
+
         setIsLoading(false);
       } catch (err) {
+        logger.error("Error loading user data:", err);
         setError(err.message);
+
+        // Fall back to auth user data
+        if (authUser) {
+          setUser(authUser);
+          setEditForm({
+            firstName: authUser.firstName || "",
+            lastName: authUser.lastName || "",
+            email: authUser.email || "",
+            phone: authUser.phone || "",
+            dateOfBirth: authUser.dateOfBirth
+              ? authUser.dateOfBirth.split("T")[0]
+              : "",
+          });
+        }
+
         setIsLoading(false);
       }
     };
 
-    loadUserData();
-  }, []);
+    if (authUser) {
+      loadUserData();
+    }
+  }, [authUser]);
 
   if (isLoading) {
     return <ProfileLoading />;
@@ -259,42 +345,171 @@ export default function ProfilePage() {
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
-    if (!isEditing) {
-      setEditForm(user);
+    if (!isEditing && user) {
+      setEditForm({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        dateOfBirth: user.dateOfBirth ? user.dateOfBirth.split("T")[0] : "",
+      });
     }
   };
 
-  const handleSave = () => {
-    setUser(editForm);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const response = await userAPI.updateProfile(editForm);
+      if (response.success) {
+        setUser(response.data.user);
+        updateUser(response.data.user);
+        setIsEditing(false);
+        showSuccess("Profile updated successfully!");
+        setError(null);
+      } else {
+        const errorMessage = response.message || "Failed to update profile";
+        setError(errorMessage);
+        showError(errorMessage);
+      }
+    } catch (err) {
+      logger.error("Error updating profile:", err);
+      const errorMessage = err.message || "Failed to update profile";
+      setError(errorMessage);
+      showError(errorMessage);
+    }
   };
 
   const handleInputChange = (field, value) => {
-    if (field.includes(".")) {
-      const [parent, child] = field.split(".");
-      setEditForm((prev) => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value,
-        },
-      }));
-    } else {
-      setEditForm((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
+    setEditForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleRemoveFromWishlist = async (itemId) => {
+    try {
+      await removeFromWishlist(itemId);
+    } catch (error) {
+      logger.error("Error removing from wishlist:", error);
     }
   };
 
-  const removeFromWishlist = (itemId) => {
-    setWishlist((prev) => prev.filter((item) => item.id !== itemId));
+  // Address management functions
+  const handleAddressInputChange = (field, value) => {
+    setAddressForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleAddAddress = () => {
+    setIsAddingAddress(true);
+    setEditingAddressId(null);
+    setAddressForm({
+      type: "home",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      addressLine1: "",
+      addressLine2: "",
+      landmark: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: "India",
+      deliveryInstructions: "",
+      isDefault: addresses.length === 0,
+    });
+  };
+
+  const handleEditAddress = (address) => {
+    setIsAddingAddress(false);
+    setEditingAddressId(address.id);
+    setAddressForm({
+      type: address.type || "home",
+      firstName: address.firstName || "",
+      lastName: address.lastName || "",
+      email: address.email || "",
+      phone: address.phone || "",
+      addressLine1: address.addressLine1 || "",
+      addressLine2: address.addressLine2 || "",
+      landmark: address.landmark || "",
+      city: address.city || "",
+      state: address.state || "",
+      postalCode: address.postalCode || "",
+      country: address.country || "India",
+      deliveryInstructions: address.deliveryInstructions || "",
+      isDefault: address.isDefault || false,
+    });
+  };
+
+  const handleSaveAddress = async () => {
+    try {
+      let response;
+      if (editingAddressId) {
+        response = await userAPI.updateAddress(editingAddressId, addressForm);
+      } else {
+        response = await userAPI.addAddress(addressForm);
+      }
+
+      if (response.success) {
+        showSuccess(
+          editingAddressId
+            ? "Address updated successfully!"
+            : "Address added successfully!"
+        );
+
+        // Reload addresses
+        const addressesResponse = await userAPI.getAddresses();
+        if (addressesResponse.success) {
+          setAddresses(addressesResponse.data.addresses || []);
+        }
+
+        setIsAddingAddress(false);
+        setEditingAddressId(null);
+      } else {
+        showError(response.message || "Failed to save address");
+      }
+    } catch (error) {
+      logger.error("Error saving address:", error);
+      showError("Failed to save address");
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    if (!confirm("Are you sure you want to delete this address?")) {
+      return;
+    }
+
+    try {
+      const response = await userAPI.deleteAddress(addressId);
+      if (response.success) {
+        showSuccess("Address deleted successfully!");
+
+        // Reload addresses
+        const addressesResponse = await userAPI.getAddresses();
+        if (addressesResponse.success) {
+          setAddresses(addressesResponse.data.addresses || []);
+        }
+      } else {
+        showError(response.message || "Failed to delete address");
+      }
+    } catch (error) {
+      logger.error("Error deleting address:", error);
+      showError("Failed to delete address");
+    }
+  };
+
+  const handleCancelAddressEdit = () => {
+    setIsAddingAddress(false);
+    setEditingAddressId(null);
   };
 
   const tabs = [
     { id: "personal", label: "Personal Info", icon: UserIcon },
     { id: "orders", label: "Order History", icon: ShoppingBagIcon },
     { id: "wishlist", label: "Wishlist", icon: HeartIcon },
+    { id: "addresses", label: "Addresses", icon: MapPinIcon },
     { id: "settings", label: "Settings", icon: Cog8ToothIcon },
   ];
 
@@ -363,9 +578,9 @@ export default function ProfilePage() {
                       >
                         <Icon className="h-5 w-5" />
                         <span className="font-medium">{tab.label}</span>
-                        {tab.id === "wishlist" && wishlist.length > 0 && (
+                        {tab.id === "wishlist" && wishlistItems.length > 0 && (
                           <span className="ml-auto bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full">
-                            {wishlist.length}
+                            {wishlistItems.length}
                           </span>
                         )}
                       </motion.button>
@@ -388,6 +603,7 @@ export default function ProfilePage() {
                     {activeTab === "personal" && "Personal Information"}
                     {activeTab === "orders" && "Order History"}
                     {activeTab === "wishlist" && "My Wishlist"}
+                    {activeTab === "addresses" && "My Addresses"}
                     {activeTab === "settings" && "Account Settings"}
                   </h3>
 
@@ -426,17 +642,17 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Name */}
+                          {/* First Name */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Full Name
+                              First Name
                             </label>
                             {isEditing ? (
                               <input
                                 type="text"
-                                value={editForm.name}
+                                value={editForm.firstName}
                                 onChange={(e) =>
-                                  handleInputChange("name", e.target.value)
+                                  handleInputChange("firstName", e.target.value)
                                 }
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               />
@@ -444,7 +660,31 @@ export default function ProfilePage() {
                               <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
                                 <UserIcon className="h-5 w-5 text-gray-400" />
                                 <span className="text-gray-900">
-                                  {user.name}
+                                  {user?.firstName || "Not provided"}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Last Name */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Last Name
+                            </label>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={editForm.lastName}
+                                onChange={(e) =>
+                                  handleInputChange("lastName", e.target.value)
+                                }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                            ) : (
+                              <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                                <UserIcon className="h-5 w-5 text-gray-400" />
+                                <span className="text-gray-900">
+                                  {user?.lastName || "Not provided"}
                                 </span>
                               </div>
                             )}
@@ -468,7 +708,7 @@ export default function ProfilePage() {
                               <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
                                 <EnvelopeIcon className="h-5 w-5 text-gray-400" />
                                 <span className="text-gray-900">
-                                  {user.email}
+                                  {user?.email || "Not provided"}
                                 </span>
                               </div>
                             )}
@@ -492,81 +732,58 @@ export default function ProfilePage() {
                               <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
                                 <PhoneIcon className="h-5 w-5 text-gray-400" />
                                 <span className="text-gray-900">
-                                  {user.phone}
+                                  {user?.phone || "Not provided"}
                                 </span>
                               </div>
                             )}
                           </div>
 
-                          {/* Address */}
-                          <div className="md:col-span-2">
+                          {/* Date of Birth */}
+                          <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Address
+                              Date of Birth
                             </label>
                             {isEditing ? (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input
-                                  type="text"
-                                  placeholder="Street Address"
-                                  value={editForm.address?.street || ""}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "address.street",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <input
-                                  type="text"
-                                  placeholder="City"
-                                  value={editForm.address?.city || ""}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "address.city",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <input
-                                  type="text"
-                                  placeholder="State"
-                                  value={editForm.address?.state || ""}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "address.state",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <input
-                                  type="text"
-                                  placeholder="PIN Code"
-                                  value={editForm.address?.pincode || ""}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "address.pincode",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                              </div>
+                              <input
+                                type="date"
+                                value={editForm.dateOfBirth}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    "dateOfBirth",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
                             ) : (
-                              <div className="flex items-start space-x-2 p-3 bg-gray-50 rounded-lg">
-                                <MapPinIcon className="h-5 w-5 text-gray-400 mt-0.5" />
-                                <div className="text-gray-900">
-                                  <div>{user.address.street}</div>
-                                  <div>
-                                    {user.address.city}, {user.address.state}{" "}
-                                    {user.address.pincode}
-                                  </div>
-                                  <div>{user.address.country}</div>
-                                </div>
+                              <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                                <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                <span className="text-gray-900">
+                                  {user?.dateOfBirth
+                                    ? new Date(
+                                        user.dateOfBirth
+                                      ).toLocaleDateString()
+                                    : "Not provided"}
+                                </span>
                               </div>
                             )}
+                          </div>
+
+                          {/* Member Since */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Member Since
+                            </label>
+                            <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                              <ClockIcon className="h-5 w-5 text-gray-400" />
+                              <span className="text-gray-900">
+                                {user?.createdAt
+                                  ? new Date(
+                                      user.createdAt
+                                    ).toLocaleDateString()
+                                  : "Not available"}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
@@ -693,7 +910,7 @@ export default function ProfilePage() {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                       >
-                        {wishlist.length === 0 ? (
+                        {wishlistItems.length === 0 ? (
                           <div className="text-center py-12">
                             <HeartIconSolid className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                             <h4 className="text-lg font-medium text-gray-900 mb-2">
@@ -711,7 +928,7 @@ export default function ProfilePage() {
                           </div>
                         ) : (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {wishlist.map((item) => (
+                            {wishlistItems.map((item) => (
                               <motion.div
                                 key={item.id}
                                 initial={{ opacity: 0, scale: 0.95 }}
@@ -760,7 +977,7 @@ export default function ProfilePage() {
                                         </Link>
                                         <motion.button
                                           onClick={() =>
-                                            removeFromWishlist(item.id)
+                                            handleRemoveFromWishlist(item.id)
                                           }
                                           whileHover={{ scale: 1.05 }}
                                           whileTap={{ scale: 0.95 }}
@@ -776,6 +993,366 @@ export default function ProfilePage() {
                             ))}
                           </div>
                         )}
+                      </motion.div>
+                    )}
+
+                    {activeTab === "addresses" && (
+                      <motion.div
+                        key="addresses"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-6"
+                      >
+                        <div className="flex justify-between items-center">
+                          <p className="text-gray-600">
+                            Manage your delivery addresses
+                          </p>
+                          <motion.button
+                            onClick={handleAddAddress}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2"
+                          >
+                            <PlusIcon className="h-4 w-4" />
+                            <span>Add New Address</span>
+                          </motion.button>
+                        </div>
+
+                        {/* Address Form */}
+                        {(isAddingAddress || editingAddressId) && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="bg-gray-50 rounded-lg p-6"
+                          >
+                            <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                              {editingAddressId
+                                ? "Edit Address"
+                                : "Add New Address"}
+                            </h4>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Address Type
+                                </label>
+                                <select
+                                  value={addressForm.type}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "type",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                  <option value="home">Home</option>
+                                  <option value="work">Work</option>
+                                  <option value="other">Other</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  First Name
+                                </label>
+                                <input
+                                  type="text"
+                                  value={addressForm.firstName}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "firstName",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Last Name
+                                </label>
+                                <input
+                                  type="text"
+                                  value={addressForm.lastName}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "lastName",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Phone Number
+                                </label>
+                                <input
+                                  type="tel"
+                                  value={addressForm.phone}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "phone",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Address Line 1
+                                </label>
+                                <input
+                                  type="text"
+                                  value={addressForm.addressLine1}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "addressLine1",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="House/Flat No., Building Name, Street"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Address Line 2 (Optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={addressForm.addressLine2}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "addressLine2",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Area, Locality"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Landmark (Optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={addressForm.landmark}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "landmark",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Near landmark"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  City
+                                </label>
+                                <input
+                                  type="text"
+                                  value={addressForm.city}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "city",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  State
+                                </label>
+                                <input
+                                  type="text"
+                                  value={addressForm.state}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "state",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Postal Code
+                                </label>
+                                <input
+                                  type="text"
+                                  value={addressForm.postalCode}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "postalCode",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Delivery Instructions (Optional)
+                                </label>
+                                <textarea
+                                  value={addressForm.deliveryInstructions}
+                                  onChange={(e) =>
+                                    handleAddressInputChange(
+                                      "deliveryInstructions",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Any special delivery instructions"
+                                  rows={3}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div className="md:col-span-2">
+                                <label className="flex items-center space-x-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={addressForm.isDefault}
+                                    onChange={(e) =>
+                                      handleAddressInputChange(
+                                        "isDefault",
+                                        e.target.checked
+                                      )
+                                    }
+                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                  />
+                                  <span className="text-sm text-gray-700">
+                                    Set as default address
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+
+                            <div className="flex space-x-3 mt-6">
+                              <motion.button
+                                onClick={handleSaveAddress}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
+                              >
+                                {editingAddressId
+                                  ? "Update Address"
+                                  : "Save Address"}
+                              </motion.button>
+                              <motion.button
+                                onClick={handleCancelAddressEdit}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-medium transition-all duration-200"
+                              >
+                                Cancel
+                              </motion.button>
+                            </div>
+                          </motion.div>
+                        )}
+
+                        {/* Address List */}
+                        <div className="space-y-4">
+                          {addresses.length === 0 ? (
+                            <div className="text-center py-8">
+                              <MapPinIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                              <p className="text-gray-500">
+                                No addresses added yet
+                              </p>
+                              <p className="text-sm text-gray-400">
+                                Add your first address to get started
+                              </p>
+                            </div>
+                          ) : (
+                            addresses.map((address) => (
+                              <motion.div
+                                key={address.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-white border border-gray-200 rounded-lg p-4"
+                              >
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <div className="flex items-center space-x-2 mb-2">
+                                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium capitalize">
+                                        {address.type}
+                                      </span>
+                                      {address.isDefault && (
+                                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                          Default
+                                        </span>
+                                      )}
+                                    </div>
+                                    <h4 className="font-semibold text-gray-900">
+                                      {address.firstName} {address.lastName}
+                                    </h4>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                      {address.addressLine1}
+                                      {address.addressLine2 &&
+                                        `, ${address.addressLine2}`}
+                                      {address.landmark &&
+                                        `, Near ${address.landmark}`}
+                                    </p>
+                                    <p className="text-gray-600 text-sm">
+                                      {address.city}, {address.state} -{" "}
+                                      {address.postalCode}
+                                    </p>
+                                    <p className="text-gray-600 text-sm">
+                                      Phone: {address.phone}
+                                    </p>
+                                    {address.deliveryInstructions && (
+                                      <p className="text-gray-500 text-sm mt-1">
+                                        Instructions:{" "}
+                                        {address.deliveryInstructions}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex space-x-2 ml-4">
+                                    <motion.button
+                                      onClick={() => handleEditAddress(address)}
+                                      whileHover={{ scale: 1.05 }}
+                                      whileTap={{ scale: 0.95 }}
+                                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                                    >
+                                      <PencilIcon className="h-4 w-4" />
+                                    </motion.button>
+                                    <motion.button
+                                      onClick={() =>
+                                        handleDeleteAddress(address.id)
+                                      }
+                                      whileHover={{ scale: 1.05 }}
+                                      whileTap={{ scale: 0.95 }}
+                                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                                    >
+                                      <TrashIcon className="h-4 w-4" />
+                                    </motion.button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            ))
+                          )}
+                        </div>
                       </motion.div>
                     )}
 
@@ -894,5 +1471,14 @@ export default function ProfilePage() {
         </div>
       </div>
     </AuthCheck>
+  );
+}
+
+// Wrapper component with Suspense boundary
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<ProfileLoading />}>
+      <ProfilePageContent />
+    </Suspense>
   );
 }

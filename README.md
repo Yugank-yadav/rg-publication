@@ -1,87 +1,80 @@
-# RG Publication 📚
+# 📚 RG Publication - Educational Books & Resources
 
-A modern, interactive educational books and resources website built with Next.js, featuring stunning 3D animations and responsive design.
+A modern, responsive e-commerce platform for educational books and resources, built with Next.js 15, featuring an interactive 3D hero section, comprehensive product catalog, and dedicated admin dashboard.
 
 ![RG Publication Website](https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&h=600&fit=crop&auto=format)
 
-## ✨ Features
+## 🌟 Features
 
-### 🎨 Interactive Design
+### **Public Website**
 
-- **3D Cursor-Tracking Book**: Interactive 3D book in hero section that responds to mouse movement
-- **Smooth Animations**: Framer Motion animations throughout the site
-- **Responsive Layout**: Mobile-first design that works on all devices
-- **Modern UI**: Clean, professional design with custom theme color (#a8f1ff)
+- **Interactive 3D Hero Section** with cursor-tracking animations
+- **Responsive Product Catalog** with advanced filtering and search
+- **Shopping Cart & Wishlist** with persistent storage
+- **User Authentication** with JWT tokens
+- **Mobile-First Design** with Tailwind CSS and Framer Motion
 
-### 📖 Content Sections
+### **Admin Dashboard**
 
-- **Hero Section**: Interactive 3D book with cursor tracking
-- **Best Selling Books**: Featured publications with hover effects
-- **Trending Products**: Hot trending books with fire badges
-- **New Arrivals**: Latest publications with sparkle badges
-- **Testimonials**: Customer reviews with ratings
-- **Contact Form**: Business contact information and inquiry form
-- **Footer**: Newsletter signup and comprehensive site navigation
+- **Clean, Dedicated Interface** separate from public website navigation
+- **Dashboard Analytics** with charts and metrics
+- **Product Management** with CRUD operations
+- **User Management** with role-based access control
+- **Order Processing** and inventory tracking
+- **Responsive Admin Sidebar** with mobile support
 
-### 🚀 Technical Features
+### **Technical Features**
 
-- **Next.js 15**: Latest version with App Router
-- **Tailwind CSS**: Utility-first CSS framework
-- **Framer Motion**: Advanced animations and interactions
-- **Image Optimization**: Next.js Image component with external image support
-- **Form Handling**: Contact form with validation
-- **SEO Optimized**: Proper meta tags and semantic HTML
-- **Production Ready**: Zero build errors, optimized for deployment
+- **Next.js 15** with App Router and Server Components
+- **Conditional Layouts** (admin vs public interfaces)
+- **Context-Based State Management** for cart, auth, and wishlist
+- **Production-Ready Logging** with environment-based levels
+- **API Integration** with comprehensive error handling
+- **Performance Optimized** with lazy loading and code splitting
 
-### 🔗 Featured Collections Navigation
+## 🚀 Live Demo
 
-- **Smart Navigation**: Homepage buttons navigate to shop with pre-applied filters
-- **URL Parameters**: `/shop?featured=bestseller`, `/shop?featured=trending`, `/shop?featured=new-arrival`
-- **Filter Synchronization**: Shop page automatically reads URL parameters and applies filters
-- **Visual Consistency**: Featured badge colors match between homepage and shop page
-- **Responsive Design**: Works seamlessly across all device sizes
+- **Website**: [https://rg-publication.vercel.app](https://rg-publication.vercel.app)
+- **Admin Dashboard**: [https://rg-publication.vercel.app/admin](https://rg-publication.vercel.app/admin)
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 15.3.3
+### **Frontend**
+
+- **Framework**: Next.js 15 with App Router
 - **Styling**: Tailwind CSS
 - **Animations**: Framer Motion
-
-## 📚 API Documentation
-
-This project includes comprehensive API documentation for backend integration:
-
-- **File**: `RG_Publication_API_Documentation.md`
-- **Endpoints**: 45+ RESTful API endpoints
-- **Features**: Authentication, Product Management, Shopping Cart, Orders, Search & Filter
-- **Token System**: Non-expiring JWT tokens for seamless user experience
-- **Database Schema**: Complete SQL schemas for all entities
-- **Implementation Guide**: Phase-wise development plan with priorities
-
-### Key API Features
-
-- **Featured Collections**: Full support for bestseller, trending, new-arrival filtering
-- **Cart Synchronization**: localStorage integration with backend persistence
-- **Search System**: Advanced product search with suggestions and analytics
-- **User Management**: Complete authentication and profile management
-- **Order Processing**: End-to-end order management with payment integration
 - **Icons**: Heroicons
-- **Images**: Next.js Image with Unsplash integration
-- **Deployment**: Vercel (recommended)
+- **State Management**: React Context API
+- **HTTP Client**: Axios with interceptors
 
-## 🚀 Quick Start
+### **Backend Integration**
 
-### Prerequisites
+- **API**: RESTful APIs with Express.js
+- **Database**: MongoDB with Mongoose
+- **Authentication**: JWT tokens with role-based access
+- **File Storage**: Multer for file uploads
 
-- Node.js 18+
-- npm or yarn
+### **Deployment**
 
-### Installation
+- **Frontend**: Vercel with automatic deployments
+- **Backend**: Railway (separate repository)
+- **Domain**: Custom domain with SSL
+
+## 📦 Installation & Setup
+
+### **Prerequisites**
+
+- Node.js 18+ and npm
+- Git for version control
+- Backend API running (see backend repository)
+
+### **Local Development**
 
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/rg-publication.git
+   git clone https://github.com/yourusername/rg-publication.git
    cd rg-publication
    ```
 
@@ -91,105 +84,137 @@ This project includes comprehensive API documentation for backend integration:
    npm install
    ```
 
-3. **Run development server**
+3. **Configure environment variables**
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Update `.env.local` with your configuration:
+
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+   NEXT_PUBLIC_APP_NAME=RG Publication
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   ```
+
+4. **Start development server**
 
    ```bash
    npm run dev
    ```
 
-4. **Open in browser**
-   ```
-   http://localhost:3000
-   ```
+5. **Open in browser**
+   - Website: [http://localhost:3000](http://localhost:3000)
+   - Admin: [http://localhost:3000/admin](http://localhost:3000/admin)
 
-### Build for Production
+### **Production Build**
 
 ```bash
-# Create production build
+# Build for production
 npm run build
 
 # Start production server
-npm run start
+npm start
+
+# Or deploy to Vercel
+vercel --prod
 ```
 
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 rg-publication/
 ├── app/                    # Next.js App Router
-│   ├── globals.css        # Global styles
-│   ├── layout.js          # Root layout
+│   ├── admin/             # Admin dashboard pages
+│   ├── auth/              # Authentication pages
+│   ├── shop/              # E-commerce pages
+│   ├── layout.js          # Root layout with conditional rendering
 │   └── page.js            # Homepage
-├── components/            # React components
-│   ├── hero-section.js    # Interactive 3D hero
-│   ├── best-selling-books.js
-│   ├── trending-products.js
-│   ├── new-arrivals.js
-│   ├── testimonials.js
-│   ├── contact-us.js
-│   └── footer.js
-├── public/               # Static assets
-├── next.config.js        # Next.js configuration
-└── tailwind.config.js    # Tailwind configuration
+├── components/            # Reusable React components
+│   ├── admin/             # Admin-specific components
+│   ├── ui/                # UI components
+│   └── ConditionalLayout.js # Layout switcher
+├── contexts/              # React Context providers
+│   ├── AuthContext.js     # Authentication state
+│   ├── CartContext.js     # Shopping cart state
+│   └── ToastContext.js    # Notification system
+├── lib/                   # Utility libraries
+│   ├── api.js             # API client with interceptors
+│   └── logger.js          # Production-ready logging
+└── public/                # Static assets
 ```
 
-## 🎯 Key Components
+## 🔐 Authentication & Authorization
 
-### Hero Section
+### **User Roles**
 
-- Interactive 3D book with cursor tracking
-- Smooth spring physics animations
-- Dynamic shadow effects
-- Responsive design
+- **Student**: Default role for registered users
+- **Admin**: Full access to admin dashboard and management features
 
-### Book Sections
+### **Admin Access**
 
-- Grid layouts (1/2/4 columns)
-- Hover animations with scale/shadow effects
-- Star ratings and pricing
-- Category badges
+To access the admin dashboard, users must:
 
-### Contact Form
+1. Be authenticated (logged in)
+2. Have `role: "admin"` in their user profile
 
-- Form validation
-- Business information display
-- Social media links
-- Interactive animations
+### **Protected Routes**
 
-## 🌐 Deployment
+- `/admin/*` - Requires admin role
+- `/profile` - Requires authentication
+- Cart operations - Requires authentication
 
-### Vercel (Recommended)
+## 🚀 Deployment Guide
 
-1. Push code to GitHub
-2. Connect repository to Vercel
-3. Deploy automatically
+### **Vercel Deployment**
 
-### Netlify
+1. **Connect GitHub Repository**
 
-1. Build the project: `npm run build`
-2. Deploy the `out` folder to Netlify
+   - Import project in Vercel dashboard
+   - Connect to your GitHub repository
 
-## 📝 Environment Variables
+2. **Configure Environment Variables**
 
-No environment variables required for basic functionality.
+   ```env
+   NEXT_PUBLIC_API_URL=https://your-backend.railway.app/api/v1
+   NEXT_PUBLIC_APP_NAME=RG Publication
+   NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
+   ```
+
+3. **Deploy**
+   - Automatic deployment on push to main branch
+   - Preview deployments for pull requests
+
+### **Custom Domain**
+
+1. Add domain in Vercel dashboard
+2. Configure DNS records
+3. SSL certificate automatically provisioned
+
+## 🔧 Development
+
+### **Available Scripts**
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint issues
+```
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License.
-
-## 🙏 Acknowledgments
-
-- **Unsplash**: High-quality images
-- **Heroicons**: Beautiful icon set
-- **Framer Motion**: Smooth animations
-- **Tailwind CSS**: Utility-first styling
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 

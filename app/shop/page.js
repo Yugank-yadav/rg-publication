@@ -4,6 +4,11 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { productAPI } from "@/lib/api";
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useToast } from "@/contexts/ToastContext";
+import logger from "@/lib/logger";
 import {
   FunnelIcon,
   XMarkIcon,
@@ -43,510 +48,13 @@ const sliderStyles = `
   }
 `;
 
-// Sample book data
-const sampleBooks = [
-  // Mathematics Books
-  {
-    id: 1,
-    title: "Complete Mathematics for Class 5",
-    subject: "Mathematics",
-    class: 5,
-    type: "Textbook",
-    price: 250,
-    image: "📐",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 2,
-    title: "Math Practice Book Class 5",
-    subject: "Mathematics",
-    class: 5,
-    type: "Practice Book",
-    price: 180,
-    image: "📐",
-    featured: "trending", // Featured in Trending section
-  },
-  {
-    id: 3,
-    title: "Advanced Math Class 5",
-    subject: "Mathematics",
-    class: 5,
-    type: "Advanced Guide",
-    price: 300,
-    image: "📐",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-
-  {
-    id: 4,
-    title: "Complete Mathematics for Class 6",
-    subject: "Mathematics",
-    class: 6,
-    type: "Textbook",
-    price: 270,
-    image: "📐",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 5,
-    title: "Math Practice Book Class 6",
-    subject: "Mathematics",
-    class: 6,
-    type: "Practice Book",
-    price: 200,
-    image: "📐",
-    featured: null, // Not featured
-  },
-  {
-    id: 6,
-    title: "Advanced Math Class 6",
-    subject: "Mathematics",
-    class: 6,
-    type: "Advanced Guide",
-    price: 320,
-    image: "📐",
-    featured: "trending", // Featured in Trending section
-  },
-
-  {
-    id: 7,
-    title: "Complete Mathematics for Class 7",
-    subject: "Mathematics",
-    class: 7,
-    type: "Textbook",
-    price: 290,
-    image: "📐",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-  {
-    id: 8,
-    title: "Math Practice Book Class 7",
-    subject: "Mathematics",
-    class: 7,
-    type: "Practice Book",
-    price: 220,
-    image: "📐",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 9,
-    title: "Advanced Math Class 7",
-    subject: "Mathematics",
-    class: 7,
-    type: "Advanced Guide",
-    price: 340,
-    image: "📐",
-    featured: null, // Not featured
-  },
-
-  {
-    id: 10,
-    title: "Complete Mathematics for Class 8",
-    subject: "Mathematics",
-    class: 8,
-    type: "Textbook",
-    price: 310,
-    image: "📐",
-    featured: "trending", // Featured in Trending section
-  },
-  {
-    id: 11,
-    title: "Math Practice Book Class 8",
-    subject: "Mathematics",
-    class: 8,
-    type: "Practice Book",
-    price: 240,
-    image: "📐",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 12,
-    title: "Advanced Math Class 8",
-    subject: "Mathematics",
-    class: 8,
-    type: "Advanced Guide",
-    price: 360,
-    image: "📐",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-
-  {
-    id: 13,
-    title: "Complete Mathematics for Class 9",
-    subject: "Mathematics",
-    class: 9,
-    type: "Textbook",
-    price: 330,
-    image: "📐",
-    featured: "trending", // Featured in Trending section
-  },
-  {
-    id: 14,
-    title: "Math Practice Book Class 9",
-    subject: "Mathematics",
-    class: 9,
-    type: "Practice Book",
-    price: 260,
-    image: "📐",
-    featured: null, // Not featured
-  },
-  {
-    id: 15,
-    title: "Advanced Math Class 9",
-    subject: "Mathematics",
-    class: 9,
-    type: "Advanced Guide",
-    price: 380,
-    image: "📐",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-
-  {
-    id: 16,
-    title: "Complete Mathematics for Class 10",
-    subject: "Mathematics",
-    class: 10,
-    type: "Textbook",
-    price: 350,
-    image: "📐",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 17,
-    title: "Math Practice Book Class 10",
-    subject: "Mathematics",
-    class: 10,
-    type: "Practice Book",
-    price: 280,
-    image: "📐",
-    featured: null, // Not featured
-  },
-  {
-    id: 18,
-    title: "Advanced Math Class 10",
-    subject: "Mathematics",
-    class: 10,
-    type: "Advanced Guide",
-    price: 400,
-    image: "📐",
-    featured: null, // Not featured
-  },
-
-  {
-    id: 19,
-    title: "Complete Mathematics for Class 11",
-    subject: "Mathematics",
-    class: 11,
-    type: "Textbook",
-    price: 420,
-    image: "📐",
-    featured: "trending", // Featured in Trending section
-  },
-  {
-    id: 20,
-    title: "Math Practice Book Class 11",
-    subject: "Mathematics",
-    class: 11,
-    type: "Practice Book",
-    price: 320,
-    image: "📐",
-    featured: null, // Not featured
-  },
-  {
-    id: 21,
-    title: "Advanced Math Class 11",
-    subject: "Mathematics",
-    class: 11,
-    type: "Advanced Guide",
-    price: 450,
-    image: "📐",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-
-  {
-    id: 22,
-    title: "Complete Mathematics for Class 12",
-    subject: "Mathematics",
-    class: 12,
-    type: "Textbook",
-    price: 450,
-    image: "📐",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 23,
-    title: "Math Practice Book Class 12",
-    subject: "Mathematics",
-    class: 12,
-    type: "Practice Book",
-    price: 350,
-    image: "📐",
-    featured: null, // Not featured
-  },
-  {
-    id: 24,
-    title: "Advanced Math Class 12",
-    subject: "Mathematics",
-    class: 12,
-    type: "Advanced Guide",
-    price: 480,
-    image: "📐",
-    featured: null, // Not featured
-  },
-
-  // Science Books
-  {
-    id: 25,
-    title: "Complete Science for Class 5",
-    subject: "Science",
-    class: 5,
-    type: "Textbook",
-    price: 240,
-    image: "🔬",
-    featured: "trending", // Featured in Trending section
-  },
-  {
-    id: 26,
-    title: "Science Lab Manual Class 5",
-    subject: "Science",
-    class: 5,
-    type: "Lab Manual",
-    price: 160,
-    image: "🔬",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-  {
-    id: 27,
-    title: "Advanced Science Class 5",
-    subject: "Science",
-    class: 5,
-    type: "Advanced Guide",
-    price: 290,
-    image: "🔬",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-
-  {
-    id: 28,
-    title: "Complete Science for Class 6",
-    subject: "Science",
-    class: 6,
-    type: "Textbook",
-    price: 260,
-    image: "🔬",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 29,
-    title: "Science Lab Manual Class 6",
-    subject: "Science",
-    class: 6,
-    type: "Lab Manual",
-    price: 180,
-    image: "🔬",
-    featured: null, // Not featured
-  },
-  {
-    id: 30,
-    title: "Advanced Science Class 6",
-    subject: "Science",
-    class: 6,
-    type: "Advanced Guide",
-    price: 310,
-    image: "🔬",
-    featured: "trending", // Featured in Trending section
-  },
-
-  {
-    id: 31,
-    title: "Complete Science for Class 7",
-    subject: "Science",
-    class: 7,
-    type: "Textbook",
-    price: 280,
-    image: "🔬",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-  {
-    id: 32,
-    title: "Science Lab Manual Class 7",
-    subject: "Science",
-    class: 7,
-    type: "Lab Manual",
-    price: 200,
-    image: "🔬",
-    featured: "trending", // Featured in Trending section
-  },
-  {
-    id: 33,
-    title: "Advanced Science Class 7",
-    subject: "Science",
-    class: 7,
-    type: "Advanced Guide",
-    price: 330,
-    image: "🔬",
-    featured: null, // Not featured
-  },
-
-  {
-    id: 34,
-    title: "Complete Science for Class 8",
-    subject: "Science",
-    class: 8,
-    type: "Textbook",
-    price: 300,
-    image: "🔬",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 35,
-    title: "Science Lab Manual Class 8",
-    subject: "Science",
-    class: 8,
-    type: "Lab Manual",
-    price: 220,
-    image: "🔬",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-  {
-    id: 36,
-    title: "Advanced Science Class 8",
-    subject: "Science",
-    class: 8,
-    type: "Advanced Guide",
-    price: 350,
-    image: "🔬",
-    featured: null, // Not featured
-  },
-
-  {
-    id: 37,
-    title: "Complete Science for Class 9",
-    subject: "Science",
-    class: 9,
-    type: "Textbook",
-    price: 320,
-    image: "🔬",
-    featured: "trending", // Featured in Trending section
-  },
-  {
-    id: 38,
-    title: "Science Lab Manual Class 9",
-    subject: "Science",
-    class: 9,
-    type: "Lab Manual",
-    price: 240,
-    image: "🔬",
-    featured: null, // Not featured
-  },
-  {
-    id: 39,
-    title: "Advanced Science Class 9",
-    subject: "Science",
-    class: 9,
-    type: "Advanced Guide",
-    price: 370,
-    image: "🔬",
-    featured: null, // Not featured
-  },
-
-  {
-    id: 40,
-    title: "Complete Science for Class 10",
-    subject: "Science",
-    class: 10,
-    type: "Textbook",
-    price: 380,
-    image: "🔬",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 41,
-    title: "Science Lab Manual Class 10",
-    subject: "Science",
-    class: 10,
-    type: "Lab Manual",
-    price: 280,
-    image: "🔬",
-    featured: null, // Not featured
-  },
-  {
-    id: 42,
-    title: "Advanced Science Class 10",
-    subject: "Science",
-    class: 10,
-    type: "Advanced Guide",
-    price: 420,
-    image: "🔬",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-
-  {
-    id: 43,
-    title: "Physics Fundamentals Class 11",
-    subject: "Science",
-    class: 11,
-    type: "Textbook",
-    price: 420,
-    image: "🔬",
-    featured: "trending", // Featured in Trending section
-  },
-  {
-    id: 44,
-    title: "Chemistry Concepts Class 11",
-    subject: "Science",
-    class: 11,
-    type: "Textbook",
-    price: 400,
-    image: "🔬",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-  {
-    id: 45,
-    title: "Biology Essentials Class 11",
-    subject: "Science",
-    class: 11,
-    type: "Textbook",
-    price: 390,
-    image: "🔬",
-    featured: null, // Not featured
-  },
-
-  {
-    id: 46,
-    title: "Physics Advanced Class 12",
-    subject: "Science",
-    class: 12,
-    type: "Textbook",
-    price: 450,
-    image: "🔬",
-    featured: "new-arrival", // Featured in New Arrivals section
-  },
-  {
-    id: 47,
-    title: "Chemistry Mastery Class 12",
-    subject: "Science",
-    class: 12,
-    type: "Textbook",
-    price: 430,
-    image: "🔬",
-    featured: "trending", // Featured in Trending section
-  },
-  {
-    id: 48,
-    title: "Biology Complete Class 12",
-    subject: "Science",
-    class: 12,
-    type: "Textbook",
-    price: 420,
-    image: "🔬",
-    featured: "bestseller", // Featured in Best Selling section
-  },
-];
+// No static data - all content should come from API
 
 function ShopContent() {
   const searchParams = useSearchParams();
-  const [filteredBooks, setFilteredBooks] = useState(sampleBooks);
+  const [filteredBooks, setFilteredBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     subjects: [],
     classes: [],
@@ -557,7 +65,59 @@ function ShopContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("class");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [wishlistedItems, setWishlistedItems] = useState(new Set());
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { showSuccess, showError } = useToast();
+
+  // Load products from API
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await productAPI.getProducts({
+          page: 1,
+          limit: 50, // Load more products for shop page
+          sortBy: "class",
+          sortOrder: "asc",
+        });
+
+        if (response.success) {
+          // Transform API data to match component expectations
+          const transformedBooks = response.data.products.map((product) => ({
+            id: product.id || product._id,
+            title: product.title,
+            subject: product.subject,
+            class: product.class,
+            type: product.type || "Textbook",
+            price: product.price,
+            image: product.images?.[0]?.url || null,
+            featured: product.featured || null,
+            inStock: product.inStock,
+            author: product.author,
+            description: product.description,
+            coverImage: product.images?.[0]?.url,
+          }));
+
+          setFilteredBooks(transformedBooks);
+        } else {
+          setError("Failed to load products");
+          // No fallback to static data - show empty state
+          setFilteredBooks([]);
+        }
+      } catch (err) {
+        logger.error("Error loading products:", err);
+        setError("Failed to load products");
+        // No fallback to static data - show empty state
+        setFilteredBooks([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   // Apply filters from URL parameters whenever they change
   useEffect(() => {
@@ -599,67 +159,94 @@ function ShopContent() {
     setFilters(newFilters);
   }, [searchParams]);
 
-  // Filter and search logic
+  // Filter and search logic with API integration
   useEffect(() => {
-    let filtered = sampleBooks;
+    const applyFiltersAndSearch = async () => {
+      try {
+        // Build search parameters
+        const searchParams = {
+          page: 1,
+          limit: 100,
+          sortBy:
+            sortBy === "class"
+              ? "class"
+              : sortBy === "alphabetical"
+              ? "title"
+              : "price",
+          sortOrder: sortBy === "price-high" ? "desc" : "asc",
+        };
 
-    // Apply subject filter
-    if (filters.subjects.length > 0) {
-      filtered = filtered.filter((book) =>
-        filters.subjects.includes(book.subject)
-      );
-    }
+        // Add search query
+        if (searchQuery) {
+          searchParams.q = searchQuery;
+        }
 
-    // Apply class filter
-    if (filters.classes.length > 0) {
-      filtered = filtered.filter((book) =>
-        filters.classes.includes(book.class)
-      );
-    }
+        // Add subject filter
+        if (filters.subjects.length > 0) {
+          searchParams.subject = filters.subjects.join(",");
+        }
 
-    // Apply type filter
-    if (filters.types.length > 0) {
-      filtered = filtered.filter((book) => filters.types.includes(book.type));
-    }
+        // Add class filter
+        if (filters.classes.length > 0) {
+          searchParams.class = filters.classes.join(",");
+        }
 
-    // Apply price range filter
-    filtered = filtered.filter(
-      (book) =>
-        book.price >= filters.priceRange[0] &&
-        book.price <= filters.priceRange[1]
-    );
+        // Add type filter
+        if (filters.types.length > 0) {
+          searchParams.type = filters.types.join(",");
+        }
 
-    // Apply featured filter
-    if (filters.featured) {
-      filtered = filtered.filter((book) => book.featured === filters.featured);
-    }
+        // Add price range filter
+        if (filters.priceRange[0] > 200) {
+          searchParams.priceMin = filters.priceRange[0];
+        }
+        if (filters.priceRange[1] < 500) {
+          searchParams.priceMax = filters.priceRange[1];
+        }
 
-    // Apply search query
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (book) =>
-          book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          book.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          book.type.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+        // Add featured filter
+        if (filters.featured) {
+          searchParams.featured = filters.featured;
+        }
 
-    // Apply sorting
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
-        case "alphabetical":
-          return a.title.localeCompare(b.title);
-        case "class":
-        default:
-          return a.class - b.class || a.subject.localeCompare(b.subject);
+        // Call search API
+        const response = await productAPI.searchProducts(searchParams);
+
+        if (response.success) {
+          // Transform API data to match component expectations
+          const transformedBooks = response.data.results.map((product) => ({
+            id: product.id || product._id,
+            title: product.title,
+            subject: product.subject,
+            class: product.class,
+            type: product.type || "Textbook",
+            price: product.price,
+            image: product.images?.[0]?.url || null,
+            featured: product.featured || null,
+            inStock: product.inStock,
+            author: product.author,
+            description: product.description,
+            coverImage: product.images?.[0]?.url,
+          }));
+
+          setFilteredBooks(transformedBooks);
+          return;
+        }
+      } catch (error) {
+        logger.error("Search/filter error:", error);
       }
-    });
 
-    setFilteredBooks(filtered);
+      // No fallback to client-side filtering - show empty state
+      setFilteredBooks([]);
+      return;
+    };
+
+    // Debounce the search to avoid too many API calls
+    const debounceTimer = setTimeout(() => {
+      applyFiltersAndSearch();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
   }, [filters, searchQuery, sortBy]);
 
   const handleFilterChange = (filterType, value) => {
@@ -683,17 +270,51 @@ function ShopContent() {
   };
 
   // Wishlist toggle function
-  const toggleWishlist = (bookId) => {
-    setWishlistedItems((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(bookId)) {
-        newSet.delete(bookId);
+  const toggleWishlist = async (book) => {
+    try {
+      if (isInWishlist(book.id)) {
+        const result = await removeFromWishlist(book.id);
+        if (result.success) {
+          showSuccess("Removed from wishlist");
+        } else {
+          showError(result.error || "Failed to remove from wishlist");
+        }
       } else {
-        newSet.add(bookId);
+        const result = await addToWishlist(book);
+        if (result.success) {
+          showSuccess("Added to wishlist");
+        } else {
+          showError(result.error || "Failed to add to wishlist");
+        }
       }
-      return newSet;
-    });
+    } catch (error) {
+      logger.error("Wishlist error:", error);
+      showError(error.message || "Please log in to manage your wishlist");
+    }
   };
+
+  // Add to cart function with proper error handling
+  const handleAddToCart = async (book) => {
+    try {
+      await addToCart(book, 1);
+    } catch (error) {
+      logger.error("Add to cart error:", error);
+
+      // Handle different error types with appropriate messages
+      if (error.code === "AUTHENTICATION_REQUIRED") {
+        showWarning("Please log in to add items to your cart");
+      } else if (error.code === "INSUFFICIENT_STOCK") {
+        showError("Sorry, this item is out of stock");
+      } else {
+        showError(error.message || "Failed to add item to cart");
+      }
+    }
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return <ShopLoading />;
+  }
 
   return (
     <div className="bg-gray-50 pb-8">
@@ -1104,11 +725,7 @@ function ShopContent() {
                     <span className="font-semibold text-gray-900">
                       {filteredBooks.length}
                     </span>{" "}
-                    of{" "}
-                    <span className="font-semibold text-gray-900">
-                      {sampleBooks.length}
-                    </span>{" "}
-                    books
+                    books found
                   </motion.p>
                 </div>
 
@@ -1229,10 +846,16 @@ function ShopContent() {
                               : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
                           }`}
                         >
-                          <div className="absolute inset-0 bg-white bg-opacity-10"></div>
+                          {/* <div className="absolute inset-0 bg-white bg-opacity-10"></div>
                           <span className="relative z-10 drop-shadow-sm">
                             {book.image}
-                          </span>
+                          </span> */}
+
+                          <img
+                            src={book.image}
+                            alt={book.title}
+                            className="w-full h-full object-cover"
+                          />
 
                           {/* Featured Badge */}
                           {book.featured && (
@@ -1301,8 +924,9 @@ function ShopContent() {
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                // Add to cart logic here
+                                handleAddToCart(book);
                               }}
+                              disabled={!book.inStock}
                               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
                             >
                               <ShoppingCartIcon className="h-3 w-3" />
@@ -1314,10 +938,10 @@ function ShopContent() {
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                toggleWishlist(book.id);
+                                toggleWishlist(book);
                               }}
                               className={`px-3 py-2 border rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md ${
-                                wishlistedItems.has(book.id)
+                                isInWishlist(book.id)
                                   ? "border-red-300 bg-red-50 text-red-600 hover:border-red-400"
                                   : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
                               }`}
@@ -1371,11 +995,7 @@ function ShopContent() {
                     <span className="font-semibold text-gray-900">
                       {filteredBooks.length}
                     </span>{" "}
-                    of{" "}
-                    <span className="font-semibold text-gray-900">
-                      {sampleBooks.length}
-                    </span>{" "}
-                    books
+                    books found
                   </motion.p>
                 </div>
 
@@ -1489,17 +1109,27 @@ function ShopContent() {
                     >
                       <Link href={`/shop/${book.id}`} className="block">
                         {/* Book Cover */}
-                        <div
-                          className={`h-36 flex items-center justify-center text-4xl relative overflow-hidden ${
-                            book.subject === "Mathematics"
-                              ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
-                              : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
-                          }`}
-                        >
-                          <div className="absolute inset-0 bg-white bg-opacity-10"></div>
-                          <span className="relative z-10 drop-shadow-sm">
-                            {book.image}
-                          </span>
+                        <div className="h-36 relative overflow-hidden">
+                          {book.coverImage ? (
+                            <img
+                              src={book.coverImage}
+                              alt={book.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div
+                              className={`h-full flex items-center justify-center text-4xl relative ${
+                                book.subject === "Mathematics"
+                                  ? "bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300"
+                                  : "bg-gradient-to-br from-green-100 via-green-200 to-green-300"
+                              }`}
+                            >
+                              <div className="absolute inset-0 bg-white bg-opacity-10"></div>
+                              <span className="relative z-10 drop-shadow-sm">
+                                {book.subject === "Mathematics" ? "📐" : "🔬"}
+                              </span>
+                            </div>
+                          )}
 
                           {/* Featured Badge */}
                           {book.featured && (
@@ -1568,8 +1198,9 @@ function ShopContent() {
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                // Add to cart logic here
+                                handleAddToCart(book);
                               }}
+                              disabled={!book.inStock}
                               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1 text-sm shadow-sm hover:shadow-md"
                             >
                               <ShoppingCartIcon className="h-3 w-3" />
@@ -1581,10 +1212,10 @@ function ShopContent() {
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                toggleWishlist(book.id);
+                                toggleWishlist(book);
                               }}
                               className={`px-3 py-2 border rounded-md transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md ${
-                                wishlistedItems.has(book.id)
+                                isInWishlist(book.id)
                                   ? "border-red-300 bg-red-50 text-red-600 hover:border-red-400"
                                   : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
                               }`}
@@ -1632,7 +1263,7 @@ function ShopContent() {
   );
 }
 
-// Loading component for Suspense fallback
+// Loading component following profile page skeleton pattern
 function ShopLoading() {
   return (
     <div className="bg-gray-50 pb-8">
@@ -1641,33 +1272,70 @@ function ShopLoading() {
           <section className="relative bg-gradient-to-br from-blue-50/30 via-white to-cyan-50/20 py-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center">
-                <div className="h-12 bg-gray-200 rounded-lg animate-pulse mb-6 mx-auto max-w-md"></div>
-                <div className="h-6 bg-gray-200 rounded-lg animate-pulse mx-auto max-w-2xl"></div>
+                <div className="h-12 bg-gray-200 rounded animate-pulse mb-6 mx-auto max-w-md"></div>
+                <div className="h-6 bg-gray-200 rounded animate-pulse mx-auto max-w-2xl"></div>
               </div>
             </div>
           </section>
+
+          {/* Search and Sort Bar Skeleton */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+            <div className="w-48">
+              <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+            <div className="lg:hidden w-24">
+              <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
         </div>
       </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-6 py-6">
+          {/* Sidebar Skeleton */}
           <div className="hidden lg:block w-72">
             <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-              <div className="h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
-              <div className="space-y-3">
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-6 bg-gray-200 rounded animate-pulse mb-6 w-32"></div>
+              <div className="space-y-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i}>
+                    <div className="h-5 bg-gray-200 rounded animate-pulse mb-3 w-24"></div>
+                    <div className="space-y-3">
+                      {[...Array(3)].map((_, j) => (
+                        <div
+                          key={j}
+                          className="h-10 bg-gray-200 rounded animate-pulse"
+                        ></div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
+
+          {/* Product Grid Skeleton */}
           <div className="flex-1">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
+              {[...Array(12)].map((_, i) => (
                 <div key={i} className="bg-white rounded-lg shadow-md p-4">
                   <div className="h-48 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2 w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                    <div className="flex gap-2 mt-3">
+                      <div className="h-6 bg-gray-200 rounded-full animate-pulse w-16"></div>
+                      <div className="h-6 bg-gray-200 rounded-full animate-pulse w-12"></div>
+                    </div>
+                    <div className="h-6 bg-gray-200 rounded animate-pulse w-20 mt-2"></div>
+                    <div className="flex gap-2 mt-3">
+                      <div className="h-10 bg-gray-200 rounded animate-pulse flex-1"></div>
+                      <div className="h-10 bg-gray-200 rounded animate-pulse w-10"></div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

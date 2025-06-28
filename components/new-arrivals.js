@@ -1,72 +1,200 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { productAPI } from "@/lib/api";
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useToast } from "@/contexts/ToastContext";
+import logger from "@/lib/logger";
 import {
   ArrowRightIcon,
   StarIcon,
   HeartIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import { StarIcon as StarSolidIcon } from "@heroicons/react/24/solid";
+import {
+  StarIcon as StarSolidIcon,
+  HeartIcon as HeartIconSolid,
+} from "@heroicons/react/24/solid";
+
+// Loading component following profile page skeleton pattern
+function NewArrivalsLoading() {
+  return (
+    <section className="relative py-20 bg-gradient-to-br from-purple-50/30 via-white to-indigo-50/20 overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-32 h-32 rounded-full opacity-10 bg-gray-200 animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-24 h-24 rounded-full opacity-10 bg-gray-200 animate-pulse" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section Header Skeleton */}
+        <div className="text-center mb-16">
+          <div className="h-8 bg-gray-200 rounded-full animate-pulse mb-6 mx-auto w-32"></div>
+          <div className="h-12 bg-gray-200 rounded animate-pulse mb-6 mx-auto max-w-md"></div>
+          <div className="h-6 bg-gray-200 rounded animate-pulse mx-auto max-w-3xl"></div>
+        </div>
+
+        {/* Books Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div className="h-64 bg-gray-200 animate-pulse"></div>
+              <div className="p-6">
+                <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse mb-3 w-3/4"></div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="h-6 bg-gray-200 rounded animate-pulse w-16"></div>
+                  <div className="h-10 bg-gray-200 rounded animate-pulse w-24"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Call to Action Skeleton */}
+        <div className="text-center">
+          <div className="h-12 bg-gray-200 rounded-xl animate-pulse mx-auto w-48"></div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function NewArrivals() {
-  // Static data for new arrival books
-  const newArrivalBooks = [
-    {
-      id: 1,
-      title: "Quantum Computing Fundamentals",
-      author: "Dr. Michael Zhang",
-      description:
-        "Dive into the fascinating world of quantum computing with this beginner-friendly comprehensive guide.",
-      price: "$19.99",
-      rating: 4.8,
-      reviews: 2847,
-      coverImage:
-        "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=300&h=400&fit=crop&auto=format",
-      category: "Technology",
-    },
-    {
-      id: 2,
-      title: "Sustainable Living Guide",
-      author: "Lisa Green",
-      description:
-        "Transform your lifestyle with practical tips for sustainable living and environmental consciousness.",
-      price: "$14.99",
-      rating: 4.9,
-      reviews: 1923,
-      coverImage:
-        "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop&auto=format",
-      category: "Lifestyle",
-    },
-    {
-      id: 3,
-      title: "AI Ethics and Society",
-      author: "Prof. Amanda Foster",
-      description:
-        "Explore the ethical implications of artificial intelligence and its impact on modern society.",
-      price: "$21.99",
-      rating: 4.7,
-      reviews: 3456,
-      coverImage:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&auto=format",
-      category: "Ethics",
-    },
-    {
-      id: 4,
-      title: "Mindful Leadership",
-      author: "Robert Chen",
-      description:
-        "Develop authentic leadership skills through mindfulness practices and emotional intelligence.",
-      price: "$17.99",
-      rating: 4.6,
-      reviews: 1567,
-      coverImage:
-        "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop&auto=format",
-      category: "Leadership",
-    },
-  ];
+  const [isLoading, setIsLoading] = useState(true);
+  const [books, setBooks] = useState([]);
+  const [error, setError] = useState(null);
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { showSuccess, showError, showWarning } = useToast();
+  // No static data - all content should come from API
+
+  // Load new arrivals from API
+  useEffect(() => {
+    const loadNewArrivals = async () => {
+      try {
+        setIsLoading(true);
+
+        const response = await productAPI.getFeaturedProducts("new-arrival");
+
+        if (response.success) {
+          // Transform API data to match component expectations
+          const transformedBooks = response.data.newArrivals.map((product) => ({
+            id: product.id,
+            title: product.title,
+            author: product.author,
+            description: product.description,
+            price: `₹${product.price}`,
+            originalPrice: product.originalPrice
+              ? `₹${product.originalPrice}`
+              : null,
+            rating: product.rating?.average || 0,
+            reviews: product.rating?.count || 0,
+            coverImage:
+              product.images?.[0]?.url ||
+              "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop&auto=format",
+            category: product.subject,
+            class: product.class,
+            inStock: product.inStock,
+          }));
+
+          setBooks(transformedBooks);
+        } else {
+          // No fallback to static data - show empty state
+          setBooks([]);
+        }
+      } catch (err) {
+        logger.error("Error loading new arrivals:", err);
+        // No fallback to static data - show empty state
+        setBooks([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadNewArrivals();
+  }, []);
+
+  // Show loading state
+  if (isLoading) {
+    return <NewArrivalsLoading />;
+  }
+
+  // Show empty state if no books
+  if (books.length === 0) {
+    return (
+      <section className="relative py-20 bg-gradient-to-br from-purple-50/30 via-white to-indigo-50/20 overflow-hidden">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+              style={{ backgroundColor: "#a8f1ff20" }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <SparklesIcon className="h-5 w-5 text-purple-500" />
+              <span className="text-sm font-semibold text-gray-700">
+                Fresh Content
+              </span>
+            </motion.div>
+
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              New{" "}
+              <span className="bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent">
+                Arrivals
+              </span>
+            </h2>
+          </motion.div>
+
+          <motion.div
+            className="text-center py-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <SparklesIcon className="h-24 w-24 text-gray-300 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              No New Arrivals Available
+            </h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              We&apos;re currently updating our new arrivals. Please check back
+              soon or browse our full catalog.
+            </p>
+            <Link href="/shop">
+              <motion.button
+                className="inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
+                style={{ backgroundColor: "#a8f1ff", color: "#1f2937" }}
+                whileHover={{
+                  scale: 1.05,
+                  y: -2,
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Browse All Books
+                <ArrowRightIcon className="h-5 w-5" />
+              </motion.button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -201,7 +329,7 @@ export default function NewArrivals() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {newArrivalBooks.map((book) => (
+          {books.map((book) => (
             <motion.div
               key={book.id}
               variants={bookVariants}
@@ -259,17 +387,47 @@ export default function NewArrivals() {
 
                     {/* Favorite Icon */}
                     <motion.button
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        // Wishlist logic here
-                        console.log(`Added ${book.title} to wishlist`);
+
+                        try {
+                          if (isInWishlist(book.id)) {
+                            const result = await removeFromWishlist(book.id);
+                            if (result.success) {
+                              showSuccess("Removed from wishlist");
+                            } else {
+                              showError(
+                                result.error || "Failed to remove from wishlist"
+                              );
+                            }
+                          } else {
+                            const result = await addToWishlist(book);
+                            if (result.success) {
+                              showSuccess("Added to wishlist");
+                            } else {
+                              showError(
+                                result.error || "Failed to add to wishlist"
+                              );
+                            }
+                          }
+                        } catch (error) {
+                          logger.error("Wishlist error:", error);
+                          showError(
+                            error.message ||
+                              "Please log in to manage your wishlist"
+                          );
+                        }
                       }}
                       className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
-                      <HeartIcon className="h-5 w-5 text-white" />
+                      {isInWishlist(book.id) ? (
+                        <HeartIconSolid className="h-5 w-5 text-red-500" />
+                      ) : (
+                        <HeartIcon className="h-5 w-5 text-white" />
+                      )}
                     </motion.button>
 
                     {/* Category Badge */}
@@ -308,21 +466,49 @@ export default function NewArrivals() {
                         {book.price}
                       </span>
                       <motion.button
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          // Add to cart logic here
-                          console.log(`Added ${book.title} to cart`);
+
+                          try {
+                            await addToCart(book, 1);
+                          } catch (error) {
+                            logger.error("Add to cart error:", error);
+
+                            // Handle different error types with appropriate messages
+                            if (error.code === "AUTHENTICATION_REQUIRED") {
+                              showWarning(
+                                "Please log in to add items to your cart"
+                              );
+                            } else if (error.code === "INSUFFICIENT_STOCK") {
+                              showError("Sorry, this item is out of stock");
+                            } else {
+                              showError(
+                                error.message || "Failed to add item to cart"
+                              );
+                            }
+                          }
                         }}
-                        className="px-4 py-2 text-sm font-semibold rounded-lg text-gray-800 transition-all duration-300"
-                        style={{ backgroundColor: "#a8f1ff" }}
-                        whileHover={{
-                          scale: 1.05,
-                          backgroundColor: "#8ee8f7",
+                        disabled={!book.inStock}
+                        className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
+                          book.inStock
+                            ? "text-gray-800"
+                            : "text-gray-500 cursor-not-allowed opacity-50"
+                        }`}
+                        style={{
+                          backgroundColor: book.inStock ? "#a8f1ff" : "#f3f4f6",
                         }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={
+                          book.inStock
+                            ? {
+                                scale: 1.05,
+                                backgroundColor: "#8ee8f7",
+                              }
+                            : {}
+                        }
+                        whileTap={book.inStock ? { scale: 0.95 } : {}}
                       >
-                        Add to Cart
+                        {book.inStock ? "Add to Cart" : "Out of Stock"}
                       </motion.button>
                     </div>
                   </div>
