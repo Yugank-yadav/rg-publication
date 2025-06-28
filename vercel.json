@@ -1,13 +1,25 @@
 {
-  "version": 2,
-  "name": "rg-publication-website",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
   "env": {
+    "NEXT_PUBLIC_APP_NAME": "RG Publication",
     "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_APP_NAME": "RG Publication"
+    }
+  },
+  "functions": {
+    "app/**/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "regions": ["bom1"],
+  "github": {
+    "autoAlias": false
   }
 }
